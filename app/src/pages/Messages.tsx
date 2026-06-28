@@ -124,9 +124,11 @@ export default function Messages() {
       <button
         onClick={() => setShowNewModal(true)}
         aria-label="Nouveau message"
-        className="fixed bottom-24 right-4 z-30 grid h-14 w-14 place-items-center rounded-full bg-primary text-white shadow-fab transition hover:bg-primary-dark active:scale-95 xl:bottom-6 xl:right-6"
+        className="fixed bottom-24 right-4 z-30 grid h-14 w-14 place-items-center rounded-full border border-white/30 bg-primary/80 text-white shadow-fab backdrop-blur-md transition hover:bg-primary/90 hover:shadow-lg active:scale-95 xl:bottom-6 xl:right-6"
+        style={{ boxShadow: '0 0 20px 4px rgba(31,168,77,0.5), 0 4px 12px rgba(0,0,0,0.15)' }}
       >
-        <SquarePen size={24} />
+        <span className="pointer-events-none absolute inset-0 rounded-full bg-primary/30 blur-md" />
+        <MessageCircle size={24} className="relative" />
       </button>
     </div>
   )

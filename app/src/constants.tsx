@@ -17,15 +17,17 @@ export interface CategoryMeta {
   key: Category
   label: string
   icon: LucideIcon
+  color: string
+  bg: string
 }
 
 export const CATEGORIES: CategoryMeta[] = [
-  { key: 'maisons', label: 'Maisons', icon: Home },
-  { key: 'vehicules', label: 'Véhicules', icon: Car },
-  { key: 'services', label: 'Services', icon: Briefcase },
-  { key: 'immobilier', label: 'Immobilier', icon: Building2 },
-  { key: 'terrains', label: 'Terrains', icon: Mountain },
-  { key: 'solutions-it', label: 'Solutions IT', icon: Monitor },
+  { key: 'maisons', label: 'Maisons', icon: Home, color: 'text-blue-600', bg: 'bg-blue-500/10' },
+  { key: 'vehicules', label: 'Véhicules', icon: Car, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+  { key: 'services', label: 'Services', icon: Briefcase, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+  { key: 'immobilier', label: 'Immobilier', icon: Building2, color: 'text-violet-600', bg: 'bg-violet-500/10' },
+  { key: 'terrains', label: 'Terrains', icon: Mountain, color: 'text-emerald-600', bg: 'bg-emerald-500/10' },
+  { key: 'solutions-it', label: 'Solutions IT', icon: Monitor, color: 'text-cyan-600', bg: 'bg-cyan-500/10' },
 ]
 
 export interface AccountTypeMeta {
