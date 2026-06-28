@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-soft text-ink font-sans antialiased;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-dark h-13 px-5;
+  }
+  .btn-outline {
+    @apply btn border border-primary text-primary hover:bg-primary-light h-13 px-5;
+  }
+  .btn-ghost {
+    @apply btn text-ink hover:bg-soft h-11 px-3;
+  }
+
+  .field {
+    @apply flex items-center gap-3 rounded-xl bg-soft px-4 h-14 text-ink
+           focus-within:ring-2 focus-within:ring-primary/30;
+  }
+  .field input {
+    @apply flex-1 bg-transparent outline-none placeholder:text-muted text-[15px];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-white
+           px-4 py-2 text-sm font-medium text-ink whitespace-nowrap transition;
+  }
+  .chip-active {
+    @apply bg-primary border-primary text-white;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-card;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer utilities {
+  .h-13 {
+    height: 3.25rem;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
