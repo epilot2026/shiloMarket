@@ -40,6 +40,12 @@ export interface Page {
   location?: string
 }
 
+export interface AnnonceMedia {
+  name: string
+  url: string
+  type: 'pdf' | 'doc' | 'file'
+}
+
 export interface Annonce {
   id: string
   title: string
@@ -50,7 +56,8 @@ export interface Annonce {
   priceSuffix?: string // ex. "mois"
   location: string
   images: string[]
-  video?: string // URL ou object URL (démo)
+  videos: string[]
+  documents: AnnonceMedia[]
   certified: boolean
   available: boolean
   status: AnnonceStatus

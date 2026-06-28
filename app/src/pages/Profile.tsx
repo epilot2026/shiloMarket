@@ -13,7 +13,9 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useData } from '../context/DataContext'
 import { ACCOUNT_TYPE_LABEL } from '../constants'
+import { useToast } from '../context/ToastContext'
 
 const MENU = [
   { icon: Package, label: 'Mes annonces' },
@@ -29,6 +31,8 @@ const MENU = [
 export default function Profile() {
   const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuth()
+  const { annonces, savedCount, followedCount } = useData()
+  const { show } = useToast()
 
   if (!isAuthenticated || !user) {
     return (
@@ -48,24 +52,24 @@ export default function Profile() {
   }
 
   return (
-    <div>
+    <div className="h-full overflow-y-auto pb-20 xl:pb-4">
       <header className="border-b border-line bg-white px-4 py-3">
         <h1 className="text-2xl font-extrabold text-primary">Profil</h1>
       </header>
 
       <div className="flex flex-col items-center px-4 py-6 text-center">
-        <img src={user.avatarUrl} alt="" className="h-24 w-24 rounded-full object-cover" />
+        <img src={user.avatarUrl} alt={user.fullName} className="h-24 w-24 rounded-full object-cover" />
         <h2 className="mt-3 text-xl font-bold">{user.fullName}</h2>
         <p className="text-sm text-muted">
           {ACCOUNT_TYPE_LABEL[user.accountType]} · {user.phone}
         </p>
-        <button className="btn-outline mt-3 h-10">Modifier</button>
+        <button onClick={() => show('Modification du profil bientôt disponible')} className="btn-outline mt-3 h-10">Modifier</button>
       </div>
 
       <div className="mx-4 grid grid-cols-3 divide-x divide-line rounded-2xl bg-white py-3 text-center shadow-card">
-        <div><div className="text-lg font-bold">12</div><div className="text-xs text-muted">Annonces</div></div>
-        <div><div className="text-lg font-bold">4</div><div className="text-xs text-muted">Pages</div></div>
-        <div><div className="text-lg font-bold">86</div><div className="text-xs text-muted">Enregistrés</div></div>
+        <div><div className="text-lg font-bold">{annonces.length}</div><div className="text-xs text-muted">Annonces</div></div>
+        <div><div className="text-lg font-bold">{followedCount}</div><div className="text-xs text-muted">Pages</div></div>
+        <div><div className="text-lg font-bold">{savedCount}</div><div className="text-xs text-muted">Enregistrés</div></div>
       </div>
 
       <ul className="mt-4">

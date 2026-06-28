@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import type { Annonce, Category, Page, Transaction } from '../types'
+import type { Annonce, AnnonceMedia, Category, Page, Transaction } from '../types'
 import { annonces as seedAnnonces } from '../data/annonces'
 
 export interface NewAnnonceInput {
@@ -11,7 +11,8 @@ export interface NewAnnonceInput {
   priceSuffix?: string
   location: string
   images?: string[]
-  video?: string
+  videos?: string[]
+  documents?: AnnonceMedia[]
   page: Page
 }
 
@@ -25,6 +26,9 @@ interface DataContextValue {
   isSaved: (id: string) => boolean
   toggleSave: (id: string) => void
   savedCount: number
+  isFollowing: (pageId: string) => boolean
+  toggleFollow: (pageId: string) => void
+  followedCount: number
 }
 
 const DataContext = createContext<DataContextValue | undefined>(undefined)
@@ -36,6 +40,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [annonces, setAnnonces] = useState<Annonce[]>(seedAnnonces)
   const [liked, setLiked] = useState<Set<string>>(new Set())
   const [saved, setSaved] = useState<Set<string>>(new Set())
+  const [followed, setFollowed] = useState<Set<string>>(new Set())
 
   const addAnnonce = useCallback((input: NewAnnonceInput): Annonce => {
     const annonce: Annonce = {
@@ -48,7 +53,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       priceSuffix: input.priceSuffix,
       location: input.location,
       images: input.images && input.images.length > 0 ? input.images : [FALLBACK_IMAGE],
-      video: input.video,
+      videos: input.videos ?? [],
+      documents: input.documents ?? [],
       certified: false,
       available: true,
       status: 'active',
@@ -78,6 +84,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const toggleFollow = useCallback((pageId: string) => {
+    setFollowed((prev) => {
+      const next = new Set(prev)
+      next.has(pageId) ? next.delete(pageId) : next.add(pageId)
+      return next
+    })
+  }, [])
+
   const value = useMemo<DataContextValue>(
     () => ({
       annonces,
@@ -89,8 +103,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
       isSaved: (id) => saved.has(id),
       toggleSave,
       savedCount: saved.size,
+      isFollowing: (pageId) => followed.has(pageId),
+      toggleFollow,
+      followedCount: followed.size,
     }),
-    [annonces, liked, saved, addAnnonce, toggleLike, toggleSave],
+    [annonces, liked, saved, followed, addAnnonce, toggleLike, toggleSave, toggleFollow],
   )
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>

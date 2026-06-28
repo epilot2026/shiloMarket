@@ -3,13 +3,18 @@ import { MapPin, Bookmark, Video } from 'lucide-react'
 import type { Annonce } from '../../types'
 import { formatPrice } from '../../lib/format'
 import { CertifiedTag } from '../ui/Badges'
+import { useData } from '../../context/DataContext'
+import { useToast } from '../../context/ToastContext'
 
 export function AnnonceGridCard({ annonce }: { annonce: Annonce }) {
   const navigate = useNavigate()
+  const { isSaved, toggleSave } = useData()
+  const { show } = useToast()
+  const saved = isSaved(annonce.id)
   return (
-    <button
+    <div
       onClick={() => navigate(`/annonce/${annonce.id}`)}
-      className="card overflow-hidden text-left"
+      className="card cursor-pointer overflow-hidden text-left"
     >
       <div className="relative">
         <img
@@ -23,10 +28,19 @@ export function AnnonceGridCard({ annonce }: { annonce: Annonce }) {
             <CertifiedTag />
           </div>
         )}
-        <span className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-ink">
-          <Bookmark size={16} />
-        </span>
-        {annonce.video && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            toggleSave(annonce.id)
+            show(saved ? 'Retiré des enregistrements' : 'Annonce enregistrée')
+          }}
+          aria-label="Enregistrer"
+          aria-pressed={saved}
+          className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-ink"
+        >
+          <Bookmark size={16} className={saved ? 'fill-primary text-primary' : ''} />
+        </button>
+        {annonce.videos.length > 0 && (
           <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold text-white">
             <Video size={12} /> Vidéo
           </span>
@@ -41,6 +55,6 @@ export function AnnonceGridCard({ annonce }: { annonce: Annonce }) {
           <MapPin size={12} /> {annonce.location}
         </div>
       </div>
-    </button>
+    </div>
   )
 }

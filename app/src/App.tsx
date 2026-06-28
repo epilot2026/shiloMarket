@@ -31,7 +31,7 @@ export default function App() {
           le bandeau démo et les barres collantes. */}
       <div className="flex h-[100dvh] flex-col bg-soft">
         <DemoBanner />
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-hidden">
           <Routes>
             <Route path="/connexion" element={<Login />} />
             <Route path="/inscription" element={<Register />} />
@@ -44,11 +44,11 @@ export default function App() {
               <Route path="/recherche" element={<SearchPage />} />
               <Route path="/parametres" element={<Settings />} />
               <Route path="/messages" element={<Messages />} />
+              <Route path="/messages/:id" element={<Conversation />} />
               <Route path="/profil" element={<Profile />} />
+              <Route path="/shorts" element={<Shorts />} />
               <Route path="*" element={<NotFound />} />
             </Route>
-            <Route path="/messages/:id" element={<Conversation />} />
-            <Route path="/shorts" element={<Shorts />} />
           </Routes>
         </div>
         <InstallPrompt />

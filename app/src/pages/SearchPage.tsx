@@ -65,7 +65,7 @@ export default function SearchPage() {
   const showTrending = !query && recentSearches.length === 0
 
   return (
-    <div className="mx-auto w-full max-w-content">
+    <div className="mx-auto h-full w-full max-w-content overflow-y-auto pb-20 xl:pb-4">
       <header className="sticky top-0 z-30 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3">
           <div className="field h-12 flex-1">

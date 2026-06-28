@@ -1,14 +1,17 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Bookmark, Share2, MapPin, MessageCircle, Phone, Video, ThumbsUp, MessageSquare } from 'lucide-react'
-import { getAnnonceById } from '../data/annonces'
+import { ArrowLeft, Bookmark, Share2, MapPin, MessageCircle, Phone, Video, ThumbsUp, MessageSquare, FileText, Download } from 'lucide-react'
 import { formatPrice, formatCount } from '../lib/format'
 import { ImageCarousel } from '../components/ui/ImageCarousel'
 import { VerifiedBadge, CertifiedTag, AvailableTag } from '../components/ui/Badges'
+import { useData } from '../context/DataContext'
+import { useToast } from '../context/ToastContext'
 
 export default function AnnonceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const annonce = id ? getAnnonceById(id) : undefined
+  const { annonces, isSaved, toggleSave } = useData()
+  const { show } = useToast()
+  const annonce = annonces.find((a) => a.id === id)
 
   if (!annonce) {
     return (
@@ -22,25 +25,61 @@ export default function AnnonceDetail() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-content pb-24 xl:pb-8">
+    <div className="mx-auto h-full w-full max-w-content overflow-y-auto pb-24 xl:pb-8">
       <header className="sticky top-0 z-30 flex items-center justify-between bg-white/95 px-3 py-2 backdrop-blur">
         <button onClick={() => navigate(-1)} className="btn-ghost text-ink">
           <ArrowLeft size={22} />
         </button>
         <div className="flex gap-1">
-          <button className="grid h-10 w-10 place-items-center rounded-full bg-soft"><Bookmark size={18} /></button>
-          <button className="grid h-10 w-10 place-items-center rounded-full bg-soft"><Share2 size={18} /></button>
+          <button
+            onClick={() => { toggleSave(annonce.id); show(isSaved(annonce.id) ? 'Retiré des enregistrements' : 'Annonce enregistrée') }}
+            aria-label="Enregistrer"
+            aria-pressed={isSaved(annonce.id)}
+            className="grid h-10 w-10 place-items-center rounded-full bg-soft"
+          >
+            <Bookmark size={18} className={isSaved(annonce.id) ? 'fill-primary text-primary' : ''} />
+          </button>
+          <button
+            onClick={() => {
+              const url = `${window.location.origin}/annonce/${annonce.id}`
+              navigator.clipboard?.writeText(url).catch(() => {})
+              show('Lien copié')
+            }}
+            aria-label="Partager"
+            className="grid h-10 w-10 place-items-center rounded-full bg-soft"
+          >
+            <Share2 size={18} />
+          </button>
         </div>
       </header>
 
       <div className="px-4">
         <ImageCarousel images={annonce.images} alt={annonce.title} />
-        {annonce.video && (
+        {annonce.videos.map((v, i) => (
           <video
-            src={annonce.video}
+            key={`video-${i}`}
+            src={v}
             controls
             className="mt-3 w-full rounded-xl bg-black"
           />
+        ))}
+        {annonce.documents.length > 0 && (
+          <div className="mt-3 space-y-2">
+            <h3 className="text-sm font-bold">Documents</h3>
+            {annonce.documents.map((doc, i) => (
+              <a
+                key={`doc-${i}`}
+                href={doc.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-xl border border-line bg-white p-3 transition hover:bg-soft"
+              >
+                <FileText size={20} className="shrink-0 text-primary" />
+                <span className="flex-1 truncate text-sm font-medium">{doc.name}</span>
+                <Download size={18} className="shrink-0 text-muted" />
+              </a>
+            ))}
+          </div>
         )}
       </div>
 
@@ -65,15 +104,17 @@ export default function AnnonceDetail() {
           <hr className="my-4 border-line" />
           <h2 className="mb-2 font-bold">Publié par</h2>
           <div className="flex items-center gap-3">
-            <img src={annonce.page.avatarUrl} alt="" className="h-12 w-12 rounded-full object-cover" />
+            <button onClick={() => navigate('/profil')} aria-label={`Voir la page ${annonce.page.name}`}>
+              <img src={annonce.page.avatarUrl} alt={annonce.page.name} className="h-12 w-12 rounded-full object-cover" />
+            </button>
             <div className="flex-1">
-              <div className="flex items-center gap-1 font-semibold">
+              <button onClick={() => navigate('/profil')} className="flex items-center gap-1 font-semibold">
                 {annonce.page.name}
                 {annonce.page.verified && <VerifiedBadge />}
-              </div>
+              </button>
               <div className="text-xs text-muted">{formatCount(annonce.page.followers)} abonnés</div>
             </div>
-            <button className="btn-outline h-9 text-sm">Voir la page</button>
+            <button onClick={() => navigate('/profil')} className="btn-outline h-9 text-sm">Voir la page</button>
           </div>
 
           <div className="mt-4 flex items-center gap-4 border-t border-line pt-3 text-sm text-muted">
@@ -85,22 +126,22 @@ export default function AnnonceDetail() {
         {/* Actions desktop */}
         <aside className="hidden xl:block">
           <div className="card sticky top-20 space-y-2 p-4">
-            <button onClick={() => navigate('/messages/c1')} className="btn-primary w-full">
+            <button onClick={() => navigate(`/messages/${annonce.id}`)} className="btn-primary w-full">
               <MessageCircle size={18} /> Discuter
             </button>
-            <button className="btn-outline w-full"><Phone size={18} /> Appeler</button>
-            <button className="btn-outline w-full"><Video size={18} /> Appel vidéo</button>
+            <button onClick={() => show('Appel audio en cours… (démo)')} className="btn-outline w-full"><Phone size={18} /> Appeler</button>
+            <button onClick={() => show('Appel vidéo en cours… (démo)')} className="btn-outline w-full"><Video size={18} /> Appel vidéo</button>
           </div>
         </aside>
       </div>
 
       {/* Barre d'action collée (mobile) */}
       <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-2 border-t border-line bg-white p-3 safe-bottom xl:hidden">
-        <button onClick={() => navigate('/messages/c1')} className="btn-primary h-12 flex-1">
+        <button onClick={() => navigate(`/messages/${annonce.id}`)} className="btn-primary h-12 flex-1">
           <MessageCircle size={18} /> Discuter
         </button>
-        <button className="grid h-12 w-14 place-items-center rounded-xl bg-primary-light text-primary"><Phone size={20} /></button>
-        <button className="grid h-12 w-14 place-items-center rounded-xl bg-primary-light text-primary"><Video size={20} /></button>
+        <button onClick={() => show('Appel audio en cours… (démo)')} aria-label="Appel audio" className="grid h-12 w-14 place-items-center rounded-xl bg-primary-light text-primary"><Phone size={20} /></button>
+        <button onClick={() => show('Appel vidéo en cours… (démo)')} aria-label="Appel vidéo" className="grid h-12 w-14 place-items-center rounded-xl bg-primary-light text-primary"><Video size={20} /></button>
       </div>
     </div>
   )

@@ -58,17 +58,30 @@ function Row({
   toggle?: { on: boolean; onChange: () => void }
   danger?: boolean
 }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={toggle !== undefined}
-      className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-soft ${danger ? 'text-live' : ''}`}
-    >
+  const content = (
+    <>
       <Icon size={20} className={danger ? 'text-live' : 'text-ink'} />
       <span className="flex-1 font-medium">{label}</span>
       {value && <span className="text-sm text-muted">{value}</span>}
       {toggle && <Toggle on={toggle.on} onChange={toggle.onChange} />}
       {!toggle && !value && <ChevronRight size={18} className="text-muted" />}
+    </>
+  )
+
+  if (toggle) {
+    return (
+      <div className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-soft ${danger ? 'text-live' : ''}`}
+    >
+      {content}
     </button>
   )
 }
@@ -103,7 +116,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-content pb-8">
+    <div className="mx-auto h-full w-full max-w-content overflow-y-auto pb-20 xl:pb-4">
       <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
         <button onClick={() => navigate(-1)} className="btn-ghost -ml-2 text-ink" aria-label="Retour">
           <ArrowLeft size={22} />

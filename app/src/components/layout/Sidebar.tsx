@@ -1,5 +1,5 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Store, PlayCircle, MessageCircle, User, PenSquare } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
+import { Home, Store, PlayCircle, MessageCircle, User } from 'lucide-react'
 import { LogoMark, LogoText } from '../ui/Logo'
 
 const items = [
@@ -11,7 +11,6 @@ const items = [
 ]
 
 export function Sidebar() {
-  const navigate = useNavigate()
   return (
     <aside className="hidden h-full w-60 shrink-0 flex-col overflow-y-auto border-r border-line bg-white px-4 py-5 xl:flex">
       <div className="flex items-center gap-2 px-2">
@@ -38,10 +37,6 @@ export function Sidebar() {
           ))}
         </ul>
       </nav>
-      <button className="btn-primary w-full" onClick={() => navigate('/publier')}>
-        <PenSquare size={18} />
-        Publier
-      </button>
     </aside>
   )
 }

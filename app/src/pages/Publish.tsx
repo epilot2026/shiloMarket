@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { CATEGORIES } from '../constants'
-import type { Category, Page, Transaction } from '../types'
+import type { Category, Page, Transaction, AnnonceMedia } from '../types'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
 import { useToast } from '../context/ToastContext'
@@ -30,7 +30,8 @@ export default function Publish() {
   const [location, setLocation] = useState('')
   const [description, setDescription] = useState('')
   const [images, setImages] = useState<string[]>([])
-  const [video, setVideo] = useState('')
+  const [videos, setVideos] = useState<string[]>([])
+  const [documents, setDocuments] = useState<AnnonceMedia[]>([])
   const [errors, setErrors] = useState<Errors>({})
   const [submitting, setSubmitting] = useState(false)
 
@@ -91,7 +92,8 @@ export default function Publish() {
       priceSuffix: transaction === 'louer' ? priceSuffix : transaction === 'devis' ? 'devis' : undefined,
       location: location.trim(),
       images,
-      video: video || undefined,
+      videos,
+      documents,
       page,
     })
 
@@ -101,7 +103,7 @@ export default function Publish() {
   }
 
   return (
-    <div className="pb-24">
+    <div className="h-full overflow-y-auto pb-24">
       <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-white px-3 py-2">
         <button onClick={() => navigate(-1)} className="btn-ghost text-ink" aria-label="Retour">
           <ArrowLeft size={22} />
@@ -220,8 +222,10 @@ export default function Publish() {
         <MediaUploader
           images={images}
           onImagesChange={setImages}
-          video={video}
-          onVideoChange={setVideo}
+          videos={videos}
+          onVideosChange={setVideos}
+          documents={documents}
+          onDocumentsChange={setDocuments}
         />
 
         <button type="submit" disabled={submitting} className="btn-primary w-full">

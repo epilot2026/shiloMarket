@@ -26,12 +26,25 @@ export function AnnonceCard({ annonce }: { annonce: Annonce }) {
     <article className="card mx-4 mt-3 overflow-hidden">
       {/* En-tête */}
       <div className="flex items-start gap-3 p-4 pb-2">
-        <img src={annonce.page.avatarUrl} alt="" className="h-11 w-11 rounded-full object-cover" />
+        <button
+          onClick={() => navigate('/profil')}
+          aria-label={`Voir la page ${annonce.page.name}`}
+        >
+          <img
+            src={annonce.page.avatarUrl}
+            alt={annonce.page.name}
+            loading="lazy"
+            className="h-11 w-11 rounded-full object-cover"
+          />
+        </button>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1 font-semibold">
+          <button
+            onClick={() => navigate('/profil')}
+            className="flex items-center gap-1 font-semibold"
+          >
             {annonce.page.name}
             {annonce.page.verified && <VerifiedBadge />}
-          </div>
+          </button>
           <div className="flex items-center gap-1 text-xs text-muted">
             <MapPin size={13} /> {annonce.location} · {annonce.createdAt}
           </div>
@@ -51,7 +64,7 @@ export function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
       <div className="relative mt-3 px-4">
         <ImageCarousel images={annonce.images} alt={annonce.title} />
-        {annonce.video && (
+        {annonce.videos.length > 0 && (
           <span className="absolute bottom-2 left-6 flex items-center gap-1 rounded bg-black/70 px-2 py-0.5 text-xs font-semibold text-white">
             <Video size={14} /> Vidéo
           </span>
@@ -118,15 +131,23 @@ export function AnnonceCard({ annonce }: { annonce: Annonce }) {
       {/* Contacter */}
       <div className="flex items-center gap-2 border-t border-line p-3">
         <button
-          onClick={() => navigate('/messages/c1')}
+          onClick={() => navigate(`/messages/${annonce.id}`)}
           className="btn-primary h-11 flex-1"
         >
           <MessageCircle size={18} /> Discuter
         </button>
-        <button className="grid h-11 w-12 place-items-center rounded-xl bg-primary-light text-primary">
+        <button
+          onClick={() => show('Appel audio en cours… (démo)')}
+          aria-label="Appel audio"
+          className="grid h-11 w-12 place-items-center rounded-xl bg-primary-light text-primary"
+        >
           <Phone size={18} />
         </button>
-        <button className="grid h-11 w-12 place-items-center rounded-xl bg-primary-light text-primary">
+        <button
+          onClick={() => show('Appel vidéo en cours… (démo)')}
+          aria-label="Appel vidéo"
+          className="grid h-11 w-12 place-items-center rounded-xl bg-primary-light text-primary"
+        >
           <Video size={18} />
         </button>
       </div>

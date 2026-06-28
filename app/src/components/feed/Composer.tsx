@@ -10,7 +10,12 @@ export function Composer() {
   return (
     <div className="card mx-4 mt-3 p-4">
       <div className="flex items-center gap-3">
-        <img src={user?.avatarUrl ?? demoUser.avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
+        <img
+          src={user?.avatarUrl ?? demoUser.avatarUrl}
+          alt={user?.fullName ?? demoUser.fullName}
+          loading="lazy"
+          className="h-10 w-10 rounded-full object-cover"
+        />
         <button onClick={go} className="flex-1 rounded-full bg-soft px-4 py-2.5 text-left text-muted">
           Publiez une annonce ou un service…
         </button>
