@@ -22,7 +22,7 @@ export default function Feed() {
   }, [])
 
   return (
-    <div>
+    <div className="mx-auto w-full max-w-content">
       <TopBar />
       {/* En-tête desktop (la TopBar est réservée au mobile) */}
       <header className="sticky top-0 z-20 hidden items-center gap-3 border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:flex">

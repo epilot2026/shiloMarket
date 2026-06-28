@@ -22,7 +22,7 @@ export default function AnnonceDetail() {
   }
 
   return (
-    <div className="pb-24 lg:pb-8">
+    <div className="mx-auto w-full max-w-content pb-24 lg:pb-8">
       <header className="sticky top-0 z-30 flex items-center justify-between bg-white/95 px-3 py-2 backdrop-blur">
         <button onClick={() => navigate(-1)} className="btn-ghost text-ink">
           <ArrowLeft size={22} />
