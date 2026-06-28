@@ -8,6 +8,7 @@ import {
   KeyRound,
   Wrench,
   Store,
+  Monitor,
   type LucideIcon,
 } from 'lucide-react'
 import type { AccountType, Category } from './types'
@@ -24,6 +25,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { key: 'services', label: 'Services', icon: Briefcase },
   { key: 'immobilier', label: 'Immobilier', icon: Building2 },
   { key: 'terrains', label: 'Terrains', icon: Mountain },
+  { key: 'solutions-it', label: 'Solutions IT', icon: Monitor },
 ]
 
 export interface AccountTypeMeta {
@@ -55,4 +57,5 @@ export const MARKETPLACE_FILTERS = [
   { key: 'services', label: 'Services' },
   { key: 'immobilier', label: 'Immobilier' },
   { key: 'terrains', label: 'Terrains' },
+  { key: 'solutions-it', label: 'Solutions IT' },
 ] as const

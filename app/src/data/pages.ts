@@ -35,6 +35,17 @@ export const pages: Page[] = [
     followers: 1980,
     location: 'Plateau, Brazzaville',
   },
+  {
+    id: 'p4',
+    name: 'ShiloTech Solutions',
+    type: 'entreprise',
+    description: 'Développement web, applications mobiles, logiciels sur mesure et maintenance informatique.',
+    avatarUrl: 'https://i.pravatar.cc/150?img=60',
+    coverUrl: 'https://picsum.photos/seed/shilotech/800/400',
+    verified: true,
+    followers: 3150,
+    location: 'Bacongo, Brazzaville',
+  },
 ]
 
 export function getPageById(id: string): Page | undefined {

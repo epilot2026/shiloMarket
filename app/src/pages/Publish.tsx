@@ -50,9 +50,11 @@ export default function Publish() {
     const e: Errors = {}
     if (title.trim().length < 5) e.title = 'Le titre doit faire au moins 5 caractères.'
     if (!category) e.category = 'Choisissez une catégorie.'
-    const priceNum = Number(price)
-    if (!price || Number.isNaN(priceNum) || priceNum <= 0)
-      e.price = 'Indiquez un prix valide (nombre positif).'
+    if (transaction !== 'devis') {
+      const priceNum = Number(price)
+      if (!price || Number.isNaN(priceNum) || priceNum <= 0)
+        e.price = 'Indiquez un prix valide (nombre positif).'
+    }
     if (location.trim().length < 3) e.location = 'Indiquez une localisation.'
     if (description.trim().length < 10)
       e.description = 'La description doit faire au moins 10 caractères.'
@@ -85,8 +87,8 @@ export default function Publish() {
       description: description.trim(),
       category: category as Category,
       transaction,
-      price: Number(price),
-      priceSuffix: transaction === 'louer' ? priceSuffix : undefined,
+      price: transaction === 'devis' ? 0 : Number(price),
+      priceSuffix: transaction === 'louer' ? priceSuffix : transaction === 'devis' ? 'devis' : undefined,
       location: location.trim(),
       images,
       video: video || undefined,
@@ -142,8 +144,8 @@ export default function Publish() {
         {/* Transaction */}
         <div>
           <label className="mb-1.5 block font-semibold">Type d'offre</label>
-          <div className="inline-flex rounded-xl bg-soft p-1">
-            {(['louer', 'vendre'] as Transaction[]).map((t) => (
+          <div className="inline-flex flex-wrap rounded-xl bg-soft p-1">
+            {(['louer', 'vendre', 'devis'] as Transaction[]).map((t) => (
               <button
                 type="button"
                 key={t}
@@ -152,13 +154,14 @@ export default function Publish() {
                   transaction === t ? 'bg-primary text-white' : 'text-ink'
                 }`}
               >
-                {t === 'louer' ? 'À louer' : 'À vendre'}
+                {t === 'louer' ? 'À louer' : t === 'vendre' ? 'À vendre' : 'Sur devis'}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Prix */}
+        {/* Prix (masqué si devis) */}
+        {transaction !== 'devis' && (
         <div className="flex gap-3">
           <div className="flex-1">
             <label className="mb-1.5 block font-semibold">Prix (FCFA)</label>
@@ -186,6 +189,7 @@ export default function Publish() {
             </div>
           )}
         </div>
+        )}
 
         {/* Localisation */}
         <div>

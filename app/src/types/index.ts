@@ -11,8 +11,9 @@ export type Category =
   | 'services'
   | 'immobilier'
   | 'terrains'
+  | 'solutions-it'
 
-export type Transaction = 'louer' | 'vendre'
+export type Transaction = 'louer' | 'vendre' | 'devis'
 
 export type AnnonceStatus = 'active' | 'louee' | 'vendue' | 'en_attente'
 
