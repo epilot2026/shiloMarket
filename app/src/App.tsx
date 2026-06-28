@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
+import { SplashScreen } from './components/ui/SplashScreen'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Feed from './pages/Feed'
@@ -19,8 +21,11 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { InstallPrompt } from './components/ui/InstallPrompt'
 
 export default function App() {
+  const [splashDone, setSplashDone] = useState(false)
+
   return (
     <ErrorBoundary>
+      {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
       {/* Coquille à hauteur fixe : la fenêtre ne scrolle pas, seules les zones
           internes (contenu, messages) défilent. Évite tout chevauchement avec
           le bandeau démo et les barres collantes. */}
