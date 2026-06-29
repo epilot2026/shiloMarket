@@ -56,49 +56,84 @@ export default function AdminDashboard() {
   }
 
   async function handleToggleRole(u: AdminUserRow) {
-    const newRole = u.role === 'super_admin' ? 'user' : 'super_admin'
-    await adminService.updateUserRole(u.id, newRole)
-    setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, role: newRole } : x)))
-    show(`${u.fullName} est maintenant ${newRole === 'super_admin' ? 'super admin' : 'utilisateur'}`)
+    try {
+      const newRole = u.role === 'super_admin' ? 'user' : 'super_admin'
+      await adminService.updateUserRole(u.id, newRole)
+      setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, role: newRole } : x)))
+      show(`${u.fullName} est maintenant ${newRole === 'super_admin' ? 'super admin' : 'utilisateur'}`)
+    } catch (err) {
+      console.error('Toggle role error:', err)
+      show('Erreur lors du changement de rôle')
+    }
   }
 
   async function handleVerifyUser(u: AdminUserRow) {
-    await adminService.verifyUser(u.id, !u.verified)
-    setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, verified: !x.verified } : x)))
-    show(`${u.fullName} ${u.verified ? 'non vérifié' : 'vérifié'}`)
+    try {
+      await adminService.verifyUser(u.id, !u.verified)
+      setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, verified: !x.verified } : x)))
+      show(`${u.fullName} ${u.verified ? 'non vérifié' : 'vérifié'}`)
+    } catch (err) {
+      console.error('Verify user error:', err)
+      show('Erreur lors de la vérification')
+    }
   }
 
   async function handleDeleteUser(u: AdminUserRow) {
     if (!confirm(`Supprimer définitivement ${u.fullName} ?`)) return
-    await adminService.deleteUser(u.id)
-    setUsers((prev) => prev.filter((x) => x.id !== u.id))
-    show('Utilisateur supprimé')
+    try {
+      await adminService.deleteUser(u.id)
+      setUsers((prev) => prev.filter((x) => x.id !== u.id))
+      show('Utilisateur supprimé')
+    } catch (err) {
+      console.error('Delete user error:', err)
+      show('Erreur lors de la suppression')
+    }
   }
 
   async function handleCertifyAnnonce(a: AdminAnnonceRow) {
-    await adminService.certifyAnnonce(a.id, !a.certified)
-    setAnnonces((prev) => prev.map((x) => (x.id === a.id ? { ...x, certified: !x.certified } : x)))
-    show(`Annonce ${a.certified ? 'décertifiée' : 'certifiée'}`)
+    try {
+      await adminService.certifyAnnonce(a.id, !a.certified)
+      setAnnonces((prev) => prev.map((x) => (x.id === a.id ? { ...x, certified: !x.certified } : x)))
+      show(`Annonce ${a.certified ? 'décertifiée' : 'certifiée'}`)
+    } catch (err) {
+      console.error('Certify annonce error:', err)
+      show('Erreur lors de la certification')
+    }
   }
 
   async function handleDeleteAnnonce(a: AdminAnnonceRow) {
     if (!confirm(`Supprimer l'annonce "${a.title}" ?`)) return
-    await adminService.deleteAnnonce(a.id)
-    setAnnonces((prev) => prev.filter((x) => x.id !== a.id))
-    show('Annonce supprimée')
+    try {
+      await adminService.deleteAnnonce(a.id)
+      setAnnonces((prev) => prev.filter((x) => x.id !== a.id))
+      show('Annonce supprimée')
+    } catch (err) {
+      console.error('Delete annonce error:', err)
+      show('Erreur lors de la suppression')
+    }
   }
 
   async function handleVerifyPage(p: AdminPageRow) {
-    await adminService.verifyPage(p.id, !p.verified)
-    setPages((prev) => prev.map((x) => (x.id === p.id ? { ...x, verified: !x.verified } : x)))
-    show(`Page ${p.verified ? 'non vérifiée' : 'vérifiée'}`)
+    try {
+      await adminService.verifyPage(p.id, !p.verified)
+      setPages((prev) => prev.map((x) => (x.id === p.id ? { ...x, verified: !x.verified } : x)))
+      show(`Page ${p.verified ? 'non vérifiée' : 'vérifiée'}`)
+    } catch (err) {
+      console.error('Verify page error:', err)
+      show('Erreur lors de la vérification')
+    }
   }
 
   async function handleDeletePage(p: AdminPageRow) {
     if (!confirm(`Supprimer la page "${p.name}" ?`)) return
-    await adminService.deletePage(p.id)
-    setPages((prev) => prev.filter((x) => x.id !== p.id))
-    show('Page supprimée')
+    try {
+      await adminService.deletePage(p.id)
+      setPages((prev) => prev.filter((x) => x.id !== p.id))
+      show('Page supprimée')
+    } catch (err) {
+      console.error('Delete page error:', err)
+      show('Erreur lors de la suppression')
+    }
   }
 
   if (!isAdmin) return null

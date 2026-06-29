@@ -5,9 +5,9 @@ import { SplashScreen } from './components/ui/SplashScreen'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Feed from './pages/Feed'
-import DemoBanner from './components/ui/DemoBanner'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { InstallPrompt } from './components/ui/InstallPrompt'
+import { ProtectedRoute } from './components/ProtectedRoute'
 
 const Marketplace = lazy(() => import('./pages/Marketplace'))
 const AnnonceDetail = lazy(() => import('./pages/AnnonceDetail'))
@@ -43,10 +43,8 @@ export default function App() {
     <ErrorBoundary>
       {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
       {/* Coquille à hauteur fixe : la fenêtre ne scrolle pas, seules les zones
-          internes (contenu, messages) défilent. Évite tout chevauchement avec
-          le bandeau démo et les barres collantes. */}
+          internes (contenu, messages) défilent. */}
       <div className="flex h-[100dvh] flex-col bg-soft">
-        <DemoBanner />
         <div className="min-h-0 flex-1 overflow-hidden">
           <Routes>
             <Route path="/connexion" element={<Login />} />
@@ -55,22 +53,22 @@ export default function App() {
               <Route path="/" element={<Feed />} />
               <Route path="/marketplace" element={<Suspense fallback={<PageLoader />}><Marketplace /></Suspense>} />
               <Route path="/annonce/:id" element={<Suspense fallback={<PageLoader />}><AnnonceDetail /></Suspense>} />
-              <Route path="/publier" element={<Suspense fallback={<PageLoader />}><Publish /></Suspense>} />
-              <Route path="/notifications" element={<Suspense fallback={<PageLoader />}><Notifications /></Suspense>} />
-              <Route path="/recherche" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
-              <Route path="/parametres" element={<Suspense fallback={<PageLoader />}><Settings /></Suspense>} />
-              <Route path="/messages" element={<Suspense fallback={<PageLoader />}><Messages /></Suspense>} />
-              <Route path="/messages/:id" element={<Suspense fallback={<PageLoader />}><Conversation /></Suspense>} />
-              <Route path="/profil" element={<Suspense fallback={<PageLoader />}><Profile /></Suspense>} />
-              <Route path="/profil/modifier" element={<Suspense fallback={<PageLoader />}><EditProfile /></Suspense>} />
               <Route path="/page/:id" element={<Suspense fallback={<PageLoader />}><PageDetail /></Suspense>} />
-              <Route path="/mes-annonces" element={<Suspense fallback={<PageLoader />}><MyAnnonces /></Suspense>} />
-              <Route path="/enregistres" element={<Suspense fallback={<PageLoader />}><SavedItems /></Suspense>} />
+              <Route path="/recherche" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
               <Route path="/aide" element={<Suspense fallback={<PageLoader />}><HelpPage /></Suspense>} />
-              <Route path="/paiements" element={<Suspense fallback={<PageLoader />}><PaymentsPage /></Suspense>} />
               <Route path="/shorts" element={<Suspense fallback={<PageLoader />}><Shorts /></Suspense>} />
-              <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
+              <Route path="/paiements" element={<Suspense fallback={<PageLoader />}><PaymentsPage /></Suspense>} />
               <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
+              <Route path="/publier" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><Publish /></ProtectedRoute></Suspense>} />
+              <Route path="/notifications" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><Notifications /></ProtectedRoute></Suspense>} />
+              <Route path="/parametres" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><Settings /></ProtectedRoute></Suspense>} />
+              <Route path="/messages" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><Messages /></ProtectedRoute></Suspense>} />
+              <Route path="/messages/:id" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><Conversation /></ProtectedRoute></Suspense>} />
+              <Route path="/profil" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><Profile /></ProtectedRoute></Suspense>} />
+              <Route path="/profil/modifier" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><EditProfile /></ProtectedRoute></Suspense>} />
+              <Route path="/mes-annonces" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><MyAnnonces /></ProtectedRoute></Suspense>} />
+              <Route path="/enregistres" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><SavedItems /></ProtectedRoute></Suspense>} />
+              <Route path="/admin" element={<Suspense fallback={<PageLoader />}><ProtectedRoute><AdminDashboard /></ProtectedRoute></Suspense>} />
             </Route>
           </Routes>
         </div>
