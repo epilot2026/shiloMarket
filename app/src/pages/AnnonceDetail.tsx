@@ -3,22 +3,24 @@ import { ArrowLeft, Bookmark, Share2, MapPin, MessageCircle, Phone, Video, Thumb
 import { formatPrice, formatCount } from '../lib/format'
 import { ImageCarousel } from '../components/ui/ImageCarousel'
 import { VerifiedBadge, CertifiedTag, AvailableTag } from '../components/ui/Badges'
+import { CommentsSection } from '../components/ui/CommentsSection'
 import { useData } from '../context/DataContext'
 import { useToast } from '../context/ToastContext'
 
 export default function AnnonceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { annonces, isSaved, toggleSave } = useData()
+  const { annonces, isSaved, toggleSave, getComments, addComment, commentCount } = useData()
   const { show } = useToast()
   const annonce = annonces.find((a) => a.id === id)
+  const comments = getComments(id || '')
 
   if (!annonce) {
     return (
       <div className="p-6 text-center text-muted">
         Annonce introuvable.
         <button onClick={() => navigate('/marketplace')} className="btn-outline mt-4">
-          Retour au marketplace
+          Retour
         </button>
       </div>
     )
@@ -116,13 +118,18 @@ export default function AnnonceDetail() {
               </button>
               <div className="text-xs text-muted">{formatCount(annonce.page.followers)} abonnés</div>
             </div>
-            <button onClick={() => navigate(`/page/${annonce.page.id}`)} className="btn-outline h-9 text-sm">Voir la page</button>
+            <button onClick={() => navigate(`/page/${annonce.page.id}`)} className="btn-outline h-9 text-sm">Voir</button>
           </div>
 
           <div className="mt-4 flex items-center gap-4 border-t border-line pt-3 text-sm text-muted">
             <span className="flex items-center gap-1"><ThumbsUp size={16} /> {annonce.reactions}</span>
-            <span className="flex items-center gap-1"><MessageSquare size={16} /> {annonce.comments}</span>
+            <span className="flex items-center gap-1"><MessageSquare size={16} /> {commentCount(annonce.id)}</span>
           </div>
+
+          <CommentsSection
+            comments={comments}
+            onAddComment={(text) => addComment(annonce.id, text)}
+          />
         </div>
 
         {/* Sidebar droite desktop */}

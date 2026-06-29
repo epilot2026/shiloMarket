@@ -4,7 +4,7 @@ import { LogoMark, LogoText } from '../ui/Logo'
 
 const items = [
   { to: '/', label: 'Accueil', icon: Home, end: true },
-  { to: '/marketplace', label: 'Marketplace', icon: Store },
+  { to: '/marketplace', label: 'Marché', icon: Store },
   { to: '/shorts', label: 'Shorts', icon: PlayCircle },
   { to: '/messages', label: 'Messages', icon: MessageCircle },
   { to: '/profil', label: 'Profil', icon: User },

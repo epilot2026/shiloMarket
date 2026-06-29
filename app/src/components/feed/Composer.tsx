@@ -22,7 +22,7 @@ export function Composer() {
           onClick={go}
           className="min-w-0 flex-1 truncate whitespace-nowrap rounded-lg border border-line px-4 py-2.5 text-left text-sm text-muted transition active:scale-[0.98]"
         >
-          Publiez une annonce ou un service…
+          Publier…
         </button>
       </div>
       <div className="mt-2.5 flex items-center gap-2 text-sm font-medium">

@@ -58,7 +58,7 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
 
   if (recording) {
     return (
-      <div className="flex items-center gap-3 border-t border-line bg-white p-2 safe-bottom pb-16">
+      <div className="flex items-center gap-3 border-t border-line bg-white p-2 safe-bottom pb-4">
         <button
           onClick={cancelRecording}
           className="grid h-10 w-10 place-items-center rounded-full bg-soft text-live"
@@ -84,7 +84,7 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-2 border-t border-line bg-white p-2 safe-bottom pb-16">
+    <div className="flex items-center gap-2 border-t border-line bg-white p-2 safe-bottom pb-4">
       <AttachmentMenu onAttach={onAttach} />
       <EmojiPicker onPick={addEmoji} />
       <input

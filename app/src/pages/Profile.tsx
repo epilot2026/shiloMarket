@@ -19,7 +19,6 @@ import { useToast } from '../context/ToastContext'
 
 const MENU = [
   { icon: Package, label: 'Mes annonces', link: '/mes-annonces' },
-  { icon: Building2, label: 'Mes pages', link: '/page/p1' },
   { icon: Bookmark, label: 'Enregistrés', link: '/enregistres' },
   { icon: PlayCircle, label: 'Mes Shorts', link: '/shorts' },
   { icon: Bell, label: 'Notifications', link: '/notifications' },

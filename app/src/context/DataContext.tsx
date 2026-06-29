@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import type { Annonce, AnnonceMedia, Category, Page, Transaction } from '../types'
 import { annonces as seedAnnonces } from '../data/annonces'
+import type { Comment } from '../components/ui/CommentsSection'
+import { useAuth } from './AuthContext'
 
 export interface NewAnnonceInput {
   title: string
@@ -29,6 +31,10 @@ interface DataContextValue {
   isFollowing: (pageId: string) => boolean
   toggleFollow: (pageId: string) => void
   followedCount: number
+  comments: Record<string, Comment[]>
+  addComment: (annonceId: string, text: string) => void
+  getComments: (annonceId: string) => Comment[]
+  commentCount: (annonceId: string) => number
 }
 
 const DataContext = createContext<DataContextValue | undefined>(undefined)
@@ -41,6 +47,31 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [liked, setLiked] = useState<Set<string>>(new Set())
   const [saved, setSaved] = useState<Set<string>>(new Set())
   const [followed, setFollowed] = useState<Set<string>>(new Set())
+  const [comments, setComments] = useState<Record<string, Comment[]>>({})
+
+  const addComment = useCallback((annonceId: string, text: string) => {
+    const comment: Comment = {
+      id: `c-${Date.now()}`,
+      userId: 'demo',
+      userName: 'Utilisateur',
+      userAvatar: 'https://via.placeholder.com/40',
+      text,
+      likes: 0,
+      createdAt: "à l'instant",
+    }
+    setComments((prev) => ({
+      ...prev,
+      [annonceId]: [...(prev[annonceId] || []), comment],
+    }))
+  }, [])
+
+  const getComments = useCallback((annonceId: string): Comment[] => {
+    return comments[annonceId] || []
+  }, [comments])
+
+  const commentCount = useCallback((annonceId: string): number => {
+    return (comments[annonceId] || []).length
+  }, [comments])
 
   const addAnnonce = useCallback((input: NewAnnonceInput): Annonce => {
     const annonce: Annonce = {
@@ -106,8 +137,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       isFollowing: (pageId) => followed.has(pageId),
       toggleFollow,
       followedCount: followed.size,
+      comments,
+      addComment,
+      getComments,
+      commentCount,
     }),
-    [annonces, liked, saved, followed, addAnnonce, toggleLike, toggleSave, toggleFollow],
+    [annonces, liked, saved, followed, comments, addAnnonce, toggleLike, toggleSave, toggleFollow, addComment, getComments, commentCount],
   )
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>
