@@ -179,7 +179,7 @@ export default function Conversation() {
           </div>
         )}
 
-        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-soft px-4 py-4 pb-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-soft px-4 py-4 pb-6">
           <DateSeparator label="Aujourd'hui" />
           {messages.map((m) => (
             <ChatMessageBubble key={m.id} message={m} onDelete={handleDeleteMessage} />

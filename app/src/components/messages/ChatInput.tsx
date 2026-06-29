@@ -61,12 +61,12 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
       <div className="flex items-center gap-3 border-t border-line bg-white p-2 safe-bottom pb-4">
         <button
           onClick={cancelRecording}
-          className="grid h-10 w-10 place-items-center rounded-full bg-soft text-live"
+          className="grid h-10 w-10 place-items-center rounded-lg bg-soft text-live"
           aria-label="Annuler"
         >
           <Trash2 size={20} />
         </button>
-        <div className="flex flex-1 items-center gap-2 rounded-full bg-soft px-4 py-2.5">
+        <div className="flex flex-1 items-center gap-2 rounded-lg bg-soft px-4 py-2.5">
           <span className="h-3 w-3 animate-pulse rounded-full bg-live" />
           <span className="text-sm font-medium text-ink">
             Enregistrement… 0:{String(recordSeconds).padStart(2, '0')}
@@ -74,7 +74,7 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
         </div>
         <button
           onClick={sendVoiceMessage}
-          className="grid h-10 w-10 place-items-center rounded-full bg-primary text-white"
+          className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-white"
           aria-label="Envoyer le vocal"
         >
           <Send size={18} />
@@ -84,7 +84,7 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-2 border-t border-line bg-white p-2 safe-bottom pb-4">
+    <div className="flex items-center gap-2 border-t border-line bg-white p-2 safe-bottom pb-6">
       <AttachmentMenu onAttach={onAttach} />
       <EmojiPicker onPick={addEmoji} />
       <input
@@ -93,12 +93,12 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && send()}
         placeholder="Écrire un message…"
-        className="flex-1 rounded-full bg-soft px-4 py-2.5 outline-none"
+        className="flex-1 rounded-lg bg-soft px-4 py-2.5 outline-none"
       />
       {draft.trim() ? (
         <button
           onClick={send}
-          className="grid h-10 w-10 place-items-center rounded-full bg-primary text-white"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary text-white"
           aria-label="Envoyer"
         >
           <Send size={18} />
@@ -106,7 +106,7 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
       ) : (
         <button
           onClick={startRecording}
-          className="grid h-10 w-10 place-items-center rounded-full bg-soft transition hover:bg-line/50"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-soft transition hover:bg-line/50"
           aria-label="Message vocal"
         >
           <Mic size={20} />
