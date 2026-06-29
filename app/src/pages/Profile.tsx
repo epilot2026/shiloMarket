@@ -53,7 +53,7 @@ export default function Profile() {
   return (
     <div className="h-full overflow-y-auto pb-16 xl:pb-4">
       <header className="safe-top border-b border-line bg-white px-4 py-3">
-        <h1 className="text-2xl font-extrabold text-ink">Profil</h1>
+        <h1 className="text-xl font-extrabold text-ink">Profil</h1>
       </header>
 
       <div className="flex flex-col items-center px-4 py-6 text-center">

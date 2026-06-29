@@ -32,7 +32,7 @@ export default function AnnonceDetail() {
         <button onClick={() => navigate(-1)} className="btn-ghost -ml-2 text-ink" aria-label="Retour">
           <ArrowLeft size={22} />
         </button>
-        <span className="text-sm font-semibold text-muted">Détail de l'annonce</span>
+        <span className="text-xs font-semibold text-muted">Détail</span>
         <div className="flex gap-1">
           <button
             onClick={() => { toggleSave(annonce.id); show(isSaved(annonce.id) ? 'Retiré des enregistrements' : 'Annonce enregistrée') }}
@@ -90,7 +90,7 @@ export default function AnnonceDetail() {
           )}
 
           {annonce.certified && <div className="mt-3"><CertifiedTag /></div>}
-          <h1 className="mt-2 text-2xl font-extrabold">{annonce.title}</h1>
+          <h1 className="mt-2 text-xl font-extrabold">{annonce.title}</h1>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <span className="text-xl font-extrabold text-primary">
               {formatPrice(annonce.price, annonce.priceSuffix)}

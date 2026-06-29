@@ -33,7 +33,7 @@ export default function Feed() {
         <TopBar />
         {/* En-tête desktop (la TopBar est réservée au mobile) */}
         <header className="safe-top sticky top-0 z-20 hidden items-center gap-3 border-b border-line bg-white/95 px-6 py-3 backdrop-blur xl:flex">
-          <h1 className="shrink-0 text-xl font-extrabold text-ink">Accueil</h1>
+          <h1 className="shrink-0 text-lg font-extrabold text-ink">Accueil</h1>
           <div className="ml-auto flex w-full max-w-sm items-center gap-3 rounded-xl bg-soft px-4 py-2.5 text-muted">
             <Search size={18} className="shrink-0 text-muted" />
             <button onClick={() => navigate('/recherche')} className="text-left text-muted">

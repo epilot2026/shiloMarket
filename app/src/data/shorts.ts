@@ -5,7 +5,7 @@ export const shorts: Short[] = [
   {
     id: 's1',
     videoPoster: 'https://picsum.photos/seed/short1/600/1000',
-    caption: 'Visite express de cette villa moderne 🏡✨ #immobilier',
+    caption: 'Visite express villa moderne 🏡✨',
     tags: ['Maisons', 'Brazzaville'],
     likes: 1240,
     comments: 86,
@@ -16,7 +16,7 @@ export const shorts: Short[] = [
   {
     id: 's2',
     videoPoster: 'https://picsum.photos/seed/short2/600/1000',
-    caption: 'Notre flotte de 4x4 prête pour vos missions 🚙',
+    caption: 'Flotte 4x4 prête missions 🚙',
     tags: ['Véhicules', 'Moungali'],
     likes: 3120,
     comments: 210,
@@ -27,7 +27,7 @@ export const shorts: Short[] = [
   {
     id: 's3',
     videoPoster: 'https://picsum.photos/seed/short3/600/1000',
-    caption: 'Appartement disponible immédiatement au Plateau 🔑',
+    caption: 'Appartement dispo Plateau 🔑',
     tags: ['Immobilier', 'Plateau'],
     likes: 870,
     comments: 54,
@@ -38,7 +38,7 @@ export const shorts: Short[] = [
   {
     id: 's4',
     videoPoster: 'https://picsum.photos/seed/short4/600/1000',
-    caption: 'Décollage immédiat pour votre site e-commerce 💻🚀',
+    caption: 'Site e-commerce prêt 💻🚀',
     tags: ['Services IT', 'Bacongo'],
     likes: 5400,
     comments: 312,
@@ -49,7 +49,7 @@ export const shorts: Short[] = [
   {
     id: 's5',
     videoPoster: 'https://picsum.photos/seed/short5/600/1000',
-    caption: 'Terrain 600 m² à Bacongo — idéal pour investir 📐🌳',
+    caption: 'Terrain 600m² investir 📐🌳',
     tags: ['Terrains', 'Bacongo'],
     likes: 980,
     comments: 67,
@@ -60,7 +60,7 @@ export const shorts: Short[] = [
   {
     id: 's6',
     videoPoster: 'https://picsum.photos/seed/short6/600/1000',
-    caption: 'Climatisation installée en 30 min ⏱️❄️ #confort',
+    caption: 'Climatisation 30 min ⏱️❄️',
     tags: ['Services', 'Moungali'],
     likes: 1560,
     comments: 92,
@@ -71,7 +71,7 @@ export const shorts: Short[] = [
   {
     id: 's7',
     videoPoster: 'https://picsum.photos/seed/short7/600/1000',
-    caption: 'Tour virtuelle de cet appartement meublé de 3 pièces 🏠✨',
+    caption: 'Tour virtuelle appartement 🏠✨',
     tags: ['Immobilier', 'Plateau'],
     likes: 2200,
     comments: 143,
@@ -82,7 +82,7 @@ export const shorts: Short[] = [
   {
     id: 's8',
     videoPoster: 'https://picsum.photos/seed/short8/600/1000',
-    caption: 'Berline récente disponible maintenant — prix négociable 🚗',
+    caption: 'Berline dispo prix négociable 🚗',
     tags: ['Véhicules', 'Brazzaville'],
     likes: 1850,
     comments: 108,

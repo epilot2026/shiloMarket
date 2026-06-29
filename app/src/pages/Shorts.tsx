@@ -52,7 +52,7 @@ function ShortItem({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/25" />
 
       {isActive && (
-        <span className="safe-top absolute top-4 left-1/2 -translate-x-1/2 font-bold text-white">Shorts</span>
+        <span className="safe-top absolute top-4 left-1/2 -translate-x-1/2 text-sm font-bold text-white">Shorts</span>
       )}
 
       {isActive && (

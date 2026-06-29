@@ -121,7 +121,7 @@ export default function Settings() {
         <button onClick={() => navigate(-1)} className="btn-ghost -ml-2 text-ink" aria-label="Retour">
           <ArrowLeft size={22} />
         </button>
-        <h1 className="text-2xl font-extrabold text-ink">Paramètres</h1>
+        <h1 className="text-xl font-extrabold text-ink">Paramètres</h1>
       </header>
 
       <Section title="Notifications">

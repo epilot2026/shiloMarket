@@ -57,7 +57,7 @@ export default function Messages() {
   return (
     <div className="h-full overflow-y-auto pb-16 xl:pb-4">
       <header className="safe-top sticky top-0 z-30 border-b border-line bg-white px-4 py-3">
-        <h1 className="text-2xl font-extrabold text-ink">Messages</h1>
+        <h1 className="text-xl font-extrabold text-ink">Messages</h1>
         <div className="field mt-3 h-12">
           <Search size={20} className="text-muted" />
           <input

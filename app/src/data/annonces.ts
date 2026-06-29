@@ -4,9 +4,9 @@ import { pages } from './pages'
 export const annonces: Annonce[] = [
   {
     id: 'a1',
-    title: 'Maison meublée 4 pièces à louer',
+    title: '🏠 Maison meublée 4 pièces',
     description:
-      "Belle maison moderne de 4 pièces entièrement meublée, située dans un quartier calme et sécurisé. Eau et électricité disponibles, parking privé et cour spacieuse.",
+      "Belle maison moderne, quartier calme. Eau/électricité disponibles, parking privé.",
     category: 'maisons',
     transaction: 'louer',
     price: 350000,
@@ -30,9 +30,9 @@ export const annonces: Annonce[] = [
   },
   {
     id: 'a2',
-    title: 'Appartement meublé Moungali',
+    title: '🏢 Appartement meublé Moungali',
     description:
-      'Appartement moderne 2 chambres, salon spacieux, cuisine équipée. Idéal pour jeune couple ou professionnel.',
+      '2 chambres, salon spacieux, cuisine équipée. Idéal jeune couple.',
     category: 'immobilier',
     transaction: 'louer',
     price: 180000,
@@ -55,9 +55,9 @@ export const annonces: Annonce[] = [
   },
   {
     id: 'a3',
-    title: 'Toyota Land Cruiser 4x4 - Location',
+    title: '🚙 Toyota Land Cruiser 4x4',
     description:
-      'Flotte de 4x4 prête pour vos missions. Chauffeur disponible sur demande. Tarifs dégressifs à la semaine.',
+      'Flotte de 4x4 pour vos missions. Chauffeur disponible. Tarifs dégressifs.',
     category: 'vehicules',
     transaction: 'louer',
     price: 75000,
@@ -80,9 +80,9 @@ export const annonces: Annonce[] = [
   },
   {
     id: 'a4',
-    title: 'Terrain 500m² titré à vendre',
+    title: '📐 Terrain 500m² titré',
     description:
-      'Terrain titré de 500m² dans une zone en plein développement. Documents en règle, accès facile.',
+      'Terrain titré, zone en développement. Documents en règle, accès facile.',
     category: 'terrains',
     transaction: 'vendre',
     price: 12000000,
@@ -101,9 +101,9 @@ export const annonces: Annonce[] = [
   },
   {
     id: 'a5',
-    title: 'Villa moderne avec piscine',
+    title: '🏡 Villa moderne avec piscine',
     description:
-      'Superbe villa 5 pièces avec piscine, jardin paysager et garage double. Quartier résidentiel sécurisé.',
+      '5 pièces, piscine, jardin, garage double. Quartier résidentiel sécurisé.',
     category: 'maisons',
     transaction: 'louer',
     price: 850000,
@@ -127,9 +127,9 @@ export const annonces: Annonce[] = [
   },
   {
     id: 'a6',
-    title: 'Création de site web vitrine & e-commerce',
+    title: '💻 Site web vitrine & e-commerce',
     description:
-      'Nous concevons votre site web sur mesure : vitrine, boutique en ligne, portfolio. Design moderne, responsive, SEO optimisé. Hébergement et nom de domaine inclus la première année.',
+      'Site sur mesure : vitrine, boutique, portfolio. Design moderne, SEO optimisé.',
     category: 'solutions-it',
     transaction: 'devis',
     price: 0,
@@ -152,9 +152,9 @@ export const annonces: Annonce[] = [
   },
   {
     id: 'a7',
-    title: 'Développement application mobile (iOS & Android)',
+    title: '📱 Application mobile iOS & Android',
     description:
-      'Application mobile native ou hybride (React Native / Flutter). Interface fluide, notifications push, paiement mobile intégré. Support et maintenance post-lancement.',
+      'App native/hybride. Interface fluide, notifications push, paiement mobile.',
     category: 'solutions-it',
     transaction: 'devis',
     price: 0,
@@ -177,9 +177,9 @@ export const annonces: Annonce[] = [
   },
   {
     id: 'a8',
-    title: 'Logiciel de gestion sur mesure (ERP / CRM)',
+    title: '🖥️ Logiciel de gestion ERP/CRM',
     description:
-      'Développement de logiciels de gestion adaptés à votre activité : facturation, stock, RH, suivi clients. Formation équipe incluse. Déploiement cloud ou local.',
+      'Logiciel sur mesure : facturation, stock, RH, clients. Formation incluse.',
     category: 'solutions-it',
     transaction: 'devis',
     price: 0,

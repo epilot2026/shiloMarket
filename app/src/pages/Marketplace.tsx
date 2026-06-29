@@ -109,7 +109,7 @@ export default function Marketplace() {
       <div className="h-full flex-1 overflow-y-auto pb-16 xl:pb-4">
         <header className="safe-top sticky top-0 z-30 border-b border-line bg-white px-4 py-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-extrabold text-ink">Marché</h1>
+            <h1 className="text-xl font-extrabold text-ink">Marché</h1>
             <button
               onClick={() => setShowFilters(true)}
               className="relative grid h-10 w-10 place-items-center rounded-full bg-soft"

@@ -40,7 +40,7 @@ export default function PageDetail() {
         <button onClick={() => navigate(-1)} className="btn-ghost -ml-2 text-ink" aria-label="Retour">
           <ArrowLeft size={22} />
         </button>
-        <span className="flex-1 truncate font-semibold">{page.name}</span>
+        <span className="flex-1 truncate text-sm font-semibold">{page.name}</span>
         <button
           onClick={() => { navigator.clipboard?.writeText(window.location.href).catch(() => {}); show('Lien copié') }}
           aria-label="Partager"

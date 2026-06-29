@@ -68,7 +68,7 @@ const MOCK_NOTIFS: Notif[] = [
     id: 'n4',
     type: 'certified',
     actor: { name: 'ShiloMarket', avatar: 'https://i.pravatar.cc/150?img=60' },
-    text: 'Félicitations ! Votre annonce a été certifiée par notre équipe.',
+    text: '🎉 Votre annonce a été certifiée !',
     time: '3 h',
     link: '/annonce/a5',
     read: true,
@@ -78,7 +78,7 @@ const MOCK_NOTIFS: Notif[] = [
     id: 'n5',
     type: 'save',
     actor: { name: 'ShiloTech Solutions', avatar: 'https://i.pravatar.cc/150?img=60', verified: true },
-    text: 'a enregistré votre annonce « Terrain 600 m² Bacongo »',
+    text: 'a enregistré votre annonce « Terrain 500m² »',
     time: '5 h',
     link: '/annonce/a4',
     read: true,
@@ -88,7 +88,7 @@ const MOCK_NOTIFS: Notif[] = [
     id: 'n6',
     type: 'trending',
     actor: { name: 'ShiloMarket', avatar: 'https://i.pravatar.cc/150?img=5' },
-    text: 'Votre annonce « Villa moderne avec piscine » fait partie des plus populaires cette semaine !',
+    text: '🔥 Votre annonce est populaire cette semaine !',
     time: '1 j',
     link: '/annonce/a5',
     read: true,
@@ -98,7 +98,7 @@ const MOCK_NOTIFS: Notif[] = [
     id: 'n7',
     type: 'like',
     actor: { name: 'Moungali Services', avatar: 'https://i.pravatar.cc/150?img=22' },
-    text: 'et 12 autres personnes ont aimé votre annonce',
+    text: 'et 12 autres ont aimé votre annonce',
     time: '2 j',
     link: '/annonce/a3',
     read: true,
@@ -142,7 +142,7 @@ export default function Notifications() {
             <button onClick={() => navigate(-1)} className="btn-ghost -ml-2 text-ink" aria-label="Retour">
               <ArrowLeft size={22} />
             </button>
-            <h1 className="text-2xl font-extrabold text-ink">Notifications</h1>
+            <h1 className="text-xl font-extrabold text-ink">Notifications</h1>
           </div>
           {unreadCount > 0 && (
             <button onClick={markAllRead} className="text-sm font-semibold text-primary">
