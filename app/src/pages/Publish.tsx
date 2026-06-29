@@ -31,7 +31,6 @@ export default function Publish() {
   const [description, setDescription] = useState('')
   const [images, setImages] = useState<string[]>([])
   const [videos, setVideos] = useState<string[]>([])
-  const [documents, setDocuments] = useState<AnnonceMedia[]>([])
   const [errors, setErrors] = useState<Errors>({})
   const [submitting, setSubmitting] = useState(false)
 
@@ -93,7 +92,7 @@ export default function Publish() {
       location: location.trim(),
       images,
       videos,
-      documents,
+      documents: [],
       page,
     })
 
@@ -224,8 +223,6 @@ export default function Publish() {
           onImagesChange={setImages}
           videos={videos}
           onVideosChange={setVideos}
-          documents={documents}
-          onDocumentsChange={setDocuments}
         />
 
         <button type="submit" disabled={submitting} className="btn-primary w-full">

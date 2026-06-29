@@ -1,24 +1,15 @@
 import { useRef, useState } from 'react'
-import { ImagePlus, Video as VideoIcon, Link2, X, Plus, FileText, Upload } from 'lucide-react'
-import type { AnnonceMedia } from '../../types'
+import { ImagePlus, Video as VideoIcon, Link2, X, Plus } from 'lucide-react'
 
 interface MediaUploaderProps {
   images: string[]
   onImagesChange: (next: string[]) => void
   videos: string[]
   onVideosChange: (next: string[]) => void
-  documents: AnnonceMedia[]
-  onDocumentsChange: (next: AnnonceMedia[]) => void
 }
 
 function revokeIfBlob(url: string) {
   if (url.startsWith('blob:')) URL.revokeObjectURL(url)
-}
-
-function detectDocType(file: File): 'pdf' | 'doc' | 'file' {
-  if (file.type === 'application/pdf') return 'pdf'
-  if (file.type.startsWith('application/vnd.openxmlformats-officedocument') || file.type.startsWith('application/msword')) return 'doc'
-  return 'file'
 }
 
 export function MediaUploader({
@@ -26,12 +17,9 @@ export function MediaUploader({
   onImagesChange,
   videos,
   onVideosChange,
-  documents,
-  onDocumentsChange,
 }: MediaUploaderProps) {
   const imageInput = useRef<HTMLInputElement>(null)
   const videoInput = useRef<HTMLInputElement>(null)
-  const docInput = useRef<HTMLInputElement>(null)
   const [imageUrl, setImageUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
 
@@ -75,24 +63,6 @@ export function MediaUploader({
     const target = videos[index]
     revokeIfBlob(target)
     onVideosChange(videos.filter((_, i) => i !== index))
-  }
-
-  function addDocFiles(files: FileList | null) {
-    if (!files) return
-    const docs: AnnonceMedia[] = Array.from(files)
-      .filter((f) => !f.type.startsWith('image/') && !f.type.startsWith('video/'))
-      .map((f) => ({
-        name: f.name,
-        url: URL.createObjectURL(f),
-        type: detectDocType(f),
-      }))
-    if (docs.length) onDocumentsChange([...documents, ...docs])
-  }
-
-  function removeDoc(index: number) {
-    const target = documents[index]
-    revokeIfBlob(target.url)
-    onDocumentsChange(documents.filter((_, i) => i !== index))
   }
 
   return (
@@ -209,55 +179,6 @@ export function MediaUploader({
             <Plus size={16} /> Ajouter
           </button>
         </div>
-      </div>
-
-      {/* Documents */}
-      <div>
-        <label className="mb-1.5 block font-semibold">Documents (optionnel)</label>
-        {documents.length > 0 && (
-          <div className="mb-2 space-y-2">
-            {documents.map((doc, i) => (
-              <div
-                key={`doc-${i}`}
-                className="flex items-center gap-3 rounded-xl border border-line bg-white p-3"
-              >
-                <FileText size={20} className="shrink-0 text-primary" />
-                <span className="flex-1 truncate text-sm font-medium">{doc.name}</span>
-                <span className="shrink-0 rounded bg-soft px-2 py-0.5 text-[10px] font-semibold uppercase text-muted">
-                  {doc.type}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => removeDoc(i)}
-                  aria-label={`Retirer ${doc.name}`}
-                  className="grid h-6 w-6 place-items-center rounded-full bg-soft text-muted hover:bg-line"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() => docInput.current?.click()}
-          className="flex w-full flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line py-5 text-muted hover:border-primary hover:text-primary"
-        >
-          <Upload size={24} />
-          <span className="text-sm font-medium">Ajouter des documents (PDF, Word, Excel…)</span>
-        </button>
-        <input
-          ref={docInput}
-          type="file"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            addDocFiles(e.target.files)
-            e.target.value = ''
-          }}
-        />
-        <p className="mt-1 text-xs text-muted">PDF, Word, Excel, PowerPoint, TXT, CSV…</p>
       </div>
     </div>
   )
