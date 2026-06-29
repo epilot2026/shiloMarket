@@ -1,13 +1,29 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { WebSocketLikeConstructor } from '@supabase/realtime-js'
+import type WebSocket from 'ws'
 
-// Client Supabase PLACEHOLDER.
-// En mode démo, VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY sont vides :
-// le client n'est pas instancié et `supabase` vaut null.
-// Aucun appel réseau n'est effectué tant que la phase P1 n'est pas activée.
 const url = import.meta.env.VITE_SUPABASE_URL ?? ''
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
 
-export const supabase: SupabaseClient | null =
-  url && key ? createClient(url, key) : null
+if (!url || !key) {
+  throw new Error(
+    'VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sont requis. Vérifiez votre fichier .env.',
+  )
+}
 
-export const isSupabaseConfigured = Boolean(url && key)
+const realtimeOptions: { params: { eventsPerSecond: number }; transport?: WebSocketLikeConstructor } = {
+  params: {
+    eventsPerSecond: 10,
+  },
+}
+
+if (typeof window === 'undefined') {
+  const { default: ws } = await import('ws')
+  realtimeOptions.transport = ws as unknown as WebSocketLikeConstructor
+}
+
+export const supabase: SupabaseClient = createClient(url, key, {
+  realtime: realtimeOptions,
+})
+
+export const isSupabaseConfigured = true

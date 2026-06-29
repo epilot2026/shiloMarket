@@ -5,6 +5,8 @@ export type AccountType =
   | 'agence'
   | 'entreprise'
 
+export type UserRole = 'user' | 'super_admin'
+
 export type Category =
   | 'maisons'
   | 'vehicules'
@@ -22,6 +24,7 @@ export interface User {
   fullName: string
   phone: string
   accountType: AccountType
+  role: UserRole
   avatarUrl: string
   bio?: string
   location?: string

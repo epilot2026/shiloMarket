@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, MapPin, MessageCircle, Share2 } from 'lucide-react'
-import { getPageById } from '../data/pages'
 import { useData } from '../context/DataContext'
 import { useToast } from '../context/ToastContext'
 import { VerifiedBadge } from '../components/ui/Badges'
 import { AnnonceGridCard } from '../components/marketplace/AnnonceGridCard'
 import { formatCount } from '../lib/format'
-import { shorts } from '../data/shorts'
+import { pagesService } from '../services/pages.service'
+import { shortsService } from '../services/shorts.service'
+import type { Page, Short } from '../types'
 
 const TABS = ['Annonces', 'Shorts', 'À propos'] as const
 type Tab = (typeof TABS)[number]
@@ -18,8 +19,37 @@ export default function PageDetail() {
   const { annonces, isFollowing, toggleFollow } = useData()
   const { show } = useToast()
   const [tab, setTab] = useState<Tab>('Annonces')
+  const [page, setPage] = useState<Page | undefined>(undefined)
+  const [pageShorts, setPageShorts] = useState<Short[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const page = id ? getPageById(id) : undefined
+  useEffect(() => {
+    if (!id) {
+      setPage(undefined)
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    Promise.all([
+      pagesService.getById(id),
+      shortsService.list({ pageId: id }),
+    ]).then(([p, s]) => {
+      setPage(p || undefined)
+      setPageShorts(s)
+      setLoading(false)
+    }).catch(() => {
+      setPage(undefined)
+      setLoading(false)
+    })
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center text-muted">
+        <p>Chargement…</p>
+      </div>
+    )
+  }
 
   if (!page) {
     return (
@@ -31,7 +61,6 @@ export default function PageDetail() {
   }
 
   const pageAnnonces = annonces.filter((a) => a.page.id === page.id)
-  const pageShorts = shorts.filter((s) => s.page.id === page.id)
   const following = isFollowing(page.id)
 
   return (
@@ -52,9 +81,9 @@ export default function PageDetail() {
 
       {/* Cover + avatar */}
       <div className="relative">
-        <img src={page.coverUrl} alt={`Couverture ${page.name}`} className="h-40 w-full object-cover" />
+        <img src={page.coverUrl} alt={`Couverture ${page.name}`} loading="lazy" className="h-40 w-full object-cover" />
         <div className="absolute -bottom-10 left-4">
-          <img src={page.avatarUrl} alt={page.name} className="h-20 w-20 rounded-full border-4 border-white object-cover" />
+          <img src={page.avatarUrl} alt={page.name} loading="lazy" className="h-20 w-20 rounded-full border-4 border-white object-cover" />
         </div>
       </div>
 

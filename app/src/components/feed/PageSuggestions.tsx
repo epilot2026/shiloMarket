@@ -1,14 +1,21 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { formatCount, handleImageError } from '../../lib/format'
 import { VerifiedBadge } from '../ui/Badges'
-import { pages } from '../../data/pages'
+import { pagesService } from '../../services/pages.service'
 import { useData } from '../../context/DataContext'
 import { useToast } from '../../context/ToastContext'
+import type { Page } from '../../types'
 
 export function PageSuggestions() {
   const navigate = useNavigate()
   const { isFollowing, toggleFollow } = useData()
   const { show } = useToast()
+  const [pages, setPages] = useState<Page[]>([])
+
+  useEffect(() => {
+    pagesService.list().then(setPages).catch(() => setPages([]))
+  }, [])
 
   return (
     <section className="px-4 py-3">

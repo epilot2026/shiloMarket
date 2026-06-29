@@ -88,7 +88,7 @@ function Row({
 
 export default function Settings() {
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { logout, isAdmin } = useAuth()
   const { show } = useToast()
 
   const [pushNotif, setPushNotif] = useState(true)
@@ -171,6 +171,12 @@ export default function Settings() {
         <Row icon={Download} label="Exporter mes données" onClick={handleExport} />
         <Row icon={Trash2} label="Effacer le cache" onClick={handleClearCache} />
       </Section>
+
+      {isAdmin && (
+        <Section title="Administration">
+          <Row icon={Shield} label="Dashboard Admin" onClick={() => navigate('/admin')} />
+        </Section>
+      )}
 
       <Section title="Support">
         <Row icon={HelpCircle} label="Aide & support" onClick={() => show('Fonctionnalité à venir')} />

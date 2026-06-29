@@ -1,22 +1,27 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MessageCircle, Search, Mic, Image as ImageIcon, SquarePen, MapPin, FileText } from 'lucide-react'
-import { pages as allPages } from '../data/pages'
 import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessageContext'
 import { useToast } from '../context/ToastContext'
 import { VerifiedBadge } from '../components/ui/Badges'
 import { NewMessageModal } from '../components/messages/NewMessageModal'
 import { SuggestedPages } from '../components/messages/SuggestedPages'
+import { pagesService } from '../services/pages.service'
 import type { Page } from '../types'
 
 export default function Messages() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const { show } = useToast()
-  const { conversations, createConversation } = useMessages()
+  const { conversations, createConversation, isLoading } = useMessages()
   const [query, setQuery] = useState('')
   const [showNewModal, setShowNewModal] = useState(false)
+  const [allPages, setAllPages] = useState<Page[]>([])
+
+  useEffect(() => {
+    pagesService.list().then(setAllPages).catch(() => setAllPages([]))
+  }, [])
 
   const filtered = useMemo(() => {
     if (!query) return conversations
@@ -30,10 +35,10 @@ export default function Messages() {
   const suggested = useMemo(() => {
     const existingIds = new Set(conversations.map((c) => c.page.id))
     return allPages.filter((p) => !existingIds.has(p.id))
-  }, [conversations])
+  }, [conversations, allPages])
 
-  function handleCreateConvo(page: Page) {
-    const id = createConversation(page)
+  async function handleCreateConvo(page: Page) {
+    const id = await createConversation(page)
     show(`Conversation avec ${page.name} créée`)
     navigate(`/messages/${id}`)
     return id
@@ -87,7 +92,7 @@ export default function Messages() {
               onClick={() => navigate(`/messages/${c.id}`)}
               className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-soft"
             >
-              <img src={c.page.avatarUrl} alt={c.page.name} className="h-12 w-12 rounded-full object-cover" />
+              <img src={c.page.avatarUrl} alt={c.page.name} loading="lazy" className="h-12 w-12 rounded-full object-cover" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1 font-semibold">
@@ -119,6 +124,8 @@ export default function Messages() {
         open={showNewModal}
         onClose={() => setShowNewModal(false)}
         onCreate={handleCreateConvo}
+        pages={allPages}
+        conversations={conversations}
       />
 
       <button

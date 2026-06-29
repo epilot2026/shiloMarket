@@ -1,10 +1,12 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TrendingUp } from 'lucide-react'
 import { formatCount } from '../../lib/format'
 import { VerifiedBadge } from '../ui/Badges'
-import { pages } from '../../data/pages'
+import { pagesService } from '../../services/pages.service'
 import { useData } from '../../context/DataContext'
 import { useToast } from '../../context/ToastContext'
+import type { Page } from '../../types'
 
 const TRENDS = [
   { tag: '#immobilier', count: 1240 },
@@ -18,6 +20,11 @@ export function RightRail() {
   const navigate = useNavigate()
   const { isFollowing, toggleFollow } = useData()
   const { show } = useToast()
+  const [pages, setPages] = useState<Page[]>([])
+
+  useEffect(() => {
+    pagesService.list().then(setPages).catch(() => setPages([]))
+  }, [])
 
   return (
     <aside className="hidden h-full w-[300px] shrink-0 overflow-y-auto border-l border-line bg-white px-4 py-5 xl:block">

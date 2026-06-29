@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { ArrowLeft, Bookmark, Share2, MapPin, MessageCircle, Phone, ThumbsUp, MessageSquare, FileText, Download } from 'lucide-react'
 import { formatPrice, formatCount } from '../lib/format'
 import { ImageCarousel } from '../components/ui/ImageCarousel'
@@ -6,6 +7,7 @@ import { VerifiedBadge, CertifiedTag, AvailableTag } from '../components/ui/Badg
 import { CommentsSection } from '../components/ui/CommentsSection'
 import { useData } from '../context/DataContext'
 import { useToast } from '../context/ToastContext'
+import type { Comment } from '../services/interactions.service'
 
 export default function AnnonceDetail() {
   const { id } = useParams()
@@ -13,7 +15,18 @@ export default function AnnonceDetail() {
   const { annonces, isSaved, toggleSave, getComments, addComment, commentCount } = useData()
   const { show } = useToast()
   const annonce = annonces.find((a) => a.id === id)
-  const comments = getComments(id || '')
+  const [comments, setComments] = useState<Comment[]>([])
+
+  useEffect(() => {
+    if (!id) return
+    let cancelled = false
+    getComments(id).then((list) => {
+      if (!cancelled) setComments(list)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [id, getComments])
 
   if (!annonce) {
     return (
@@ -109,7 +122,7 @@ export default function AnnonceDetail() {
           <h2 className="mb-2 font-bold">Publié par</h2>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate(`/page/${annonce.page.id}`)} aria-label={`Voir la page ${annonce.page.name}`}>
-              <img src={annonce.page.avatarUrl} alt={annonce.page.name} className="h-12 w-12 rounded-full object-cover" />
+              <img src={annonce.page.avatarUrl} alt={annonce.page.name} loading="lazy" className="h-12 w-12 rounded-full object-cover" />
             </button>
             <div className="flex-1">
               <button onClick={() => navigate(`/page/${annonce.page.id}`)} className="flex items-center gap-1 font-semibold">

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { Image, Video, MapPin } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { demoUser } from '../../data/users'
 import { handleImageError } from '../../lib/format'
+
+const FALLBACK_AVATAR = 'https://i.pravatar.cc/150?img=1'
 
 export function Composer() {
   const navigate = useNavigate()
@@ -12,8 +13,8 @@ export function Composer() {
     <div className="border-b border-line px-4 py-3">
       <div className="flex items-center gap-3">
         <img
-          src={user?.avatarUrl ?? demoUser.avatarUrl}
-          alt={user?.fullName ?? demoUser.fullName}
+          src={user?.avatarUrl ?? FALLBACK_AVATAR}
+          alt={user?.fullName ?? 'Utilisateur'}
           loading="lazy"
           onError={handleImageError}
           className="h-10 w-10 flex-shrink-0 rounded-full object-cover"

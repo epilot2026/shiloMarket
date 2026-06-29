@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { CATEGORIES } from '../constants'
-import type { Category, Page, Transaction, AnnonceMedia } from '../types'
+import type { Category, Transaction } from '../types'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
 import { useToast } from '../context/ToastContext'
@@ -68,21 +68,8 @@ export default function Publish() {
     if (Object.keys(found).length > 0) return
 
     setSubmitting(true)
-    // Simulation d'une latence réseau (démo, sans backend).
-    await new Promise((r) => setTimeout(r, 600))
 
-    const page: Page = {
-      id: 'me',
-      name: user!.fullName,
-      type: 'proprietaire',
-      avatarUrl: user!.avatarUrl,
-      coverUrl: 'https://picsum.photos/seed/mypage/800/400',
-      verified: Boolean(user!.verified),
-      followers: 0,
-      location: user!.location,
-    }
-
-    const created = addAnnonce({
+    const created = await addAnnonce({
       title: title.trim(),
       description: description.trim(),
       category: category as Category,
@@ -93,7 +80,6 @@ export default function Publish() {
       images,
       videos,
       documents: [],
-      page,
     })
 
     setSubmitting(false)

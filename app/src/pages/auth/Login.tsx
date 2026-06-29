@@ -25,9 +25,12 @@ export default function Login() {
       return
     }
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 600))
-    await login(phone, password)
+    const { error: authError } = await login(phone, password)
     setLoading(false)
+    if (authError) {
+      setError(authError)
+      return
+    }
     navigate('/')
   }
 

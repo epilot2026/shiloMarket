@@ -1,19 +1,19 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Search, X, Users } from 'lucide-react'
-import { pages } from '../../data/pages'
-import { conversations } from '../../data/messages'
 import { VerifiedBadge } from '../ui/Badges'
 import { SuggestedPages } from './SuggestedPages'
-import type { Page } from '../../types'
+import type { Conversation, Page } from '../../types'
 
 interface Props {
   open: boolean
   onClose: () => void
   onCreate: (page: Page) => void
+  pages: Page[]
+  conversations: Conversation[]
 }
 
-export function NewMessageModal({ open, onClose, onCreate }: Props) {
+export function NewMessageModal({ open, onClose, onCreate, pages, conversations }: Props) {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
 
@@ -29,12 +29,12 @@ export function NewMessageModal({ open, onClose, onCreate }: Props) {
       )
     }
     return list
-  }, [query])
+  }, [query, pages, conversations])
 
   if (!open) return null
 
-  function handleSelect(page: Page) {
-    const convoId = onCreate(page)
+  async function handleSelect(page: Page) {
+    const convoId = await onCreate(page)
     setQuery('')
     onClose()
     navigate(`/messages/${convoId}`)

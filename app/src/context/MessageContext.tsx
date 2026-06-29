@@ -1,22 +1,63 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { ChatMessage, Conversation, Page } from '../types'
-import { conversations as seedConversations, sampleMessages } from '../data/messages'
+import { messagesService } from '../services/messages.service'
+import { useAuth } from './AuthContext'
 
 interface MessageContextValue {
   conversations: Conversation[]
+  isLoading: boolean
   getConversation: (id: string) => Conversation | undefined
   getMessages: (conversationId: string) => ChatMessage[]
-  sendMessage: (conversationId: string, message: ChatMessage) => void
-  deleteMessage: (conversationId: string, messageId: string) => void
-  createConversation: (page: Page, annonceTitle?: string) => string
-  markAsRead: (conversationId: string) => void
+  sendMessage: (conversationId: string, content: string, type?: ChatMessage['type'], mediaUrl?: string) => Promise<void>
+  createConversation: (page: Page, initialMessage?: string) => Promise<string>
+  markAsRead: (conversationId: string) => Promise<void>
+  loadMessages: (conversationId: string) => Promise<void>
 }
 
 const MessageContext = createContext<MessageContextValue | undefined>(undefined)
 
 export function MessageProvider({ children }: { children: ReactNode }) {
-  const [conversations, setConversations] = useState<Conversation[]>(seedConversations)
-  const [messagesByConvo, setMessagesByConvo] = useState<Record<string, ChatMessage[]>>({ ...sampleMessages })
+  const { isAuthenticated } = useAuth()
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [messagesByConvo, setMessagesByConvo] = useState<Record<string, ChatMessage[]>>({})
+  const [isLoading, setIsLoading] = useState(true)
+
+  const loadConversations = useCallback(async () => {
+    if (!isAuthenticated) {
+      setConversations([])
+      setIsLoading(false)
+      return
+    }
+    setIsLoading(true)
+    try {
+      const list = await messagesService.listConversations()
+      setConversations(list)
+    } catch (err) {
+      console.error('Erreur chargement conversations', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    loadConversations()
+  }, [loadConversations])
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const subscription = messagesService.subscribeToConversations((conversation) => {
+      setConversations((prev) => {
+        const existing = prev.find((c) => c.id === conversation.id)
+        if (existing) return prev
+        return [conversation, ...prev]
+      })
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [isAuthenticated])
 
   const getConversation = useCallback(
     (id: string) => conversations.find((c) => c.id === id),
@@ -28,87 +69,110 @@ export function MessageProvider({ children }: { children: ReactNode }) {
     [messagesByConvo],
   )
 
-  const sendMessage = useCallback((conversationId: string, message: ChatMessage) => {
-    setMessagesByConvo((prev) => ({
-      ...prev,
-      [conversationId]: [...(prev[conversationId] ?? []), message],
-    }))
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.id === conversationId
-          ? {
-              ...c,
-              lastPreview:
-                message.type === 'text'
-                  ? message.content
-                  : message.type === 'voice'
-                    ? `Message vocal (${message.content})`
-                    : message.type === 'image'
-                      ? 'Photo'
-                      : message.type === 'location'
-                        ? 'Position'
-                        : 'Document',
-              lastKind: message.type,
-              time: message.time,
-              unread: 0,
-            }
-          : c,
-      ),
-    )
+  const loadMessages = useCallback(async (conversationId: string) => {
+    const list = await messagesService.listMessages(conversationId)
+    setMessagesByConvo((prev) => ({ ...prev, [conversationId]: list }))
   }, [])
 
-  const deleteMessage = useCallback((conversationId: string, messageId: string) => {
-    setMessagesByConvo((prev) => ({
-      ...prev,
-      [conversationId]: (prev[conversationId] ?? []).filter((m) => m.id !== messageId),
-    }))
-  }, [])
+  const sendMessage = useCallback(
+    async (conversationId: string, content: string, type: ChatMessage['type'] = 'text', mediaUrl?: string) => {
+      const sent = await messagesService.sendMessage({ conversationId, content, type, mediaUrl })
+      setMessagesByConvo((prev) => ({
+        ...prev,
+        [conversationId]: [...(prev[conversationId] ?? []), sent],
+      }))
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === conversationId
+            ? {
+                ...c,
+                lastPreview: content,
+                lastKind: type,
+                time: sent.time,
+              }
+            : c,
+        ),
+      )
+    },
+    [],
+  )
 
-  const createConversation = useCallback((page: Page, annonceTitle?: string): string => {
-    let newId = ''
-    setConversations((prev) => {
-      const existing = prev.find((c) => c.page.id === page.id)
-      if (existing) {
-        newId = existing.id
-        return prev
-      }
-      newId = `c-${page.id}-${Date.now()}`
-      const convo: Conversation = {
-        id: newId,
-        page,
-        lastPreview: 'Nouvelle conversation',
-        lastKind: 'text',
-        time: 'maintenant',
-        unread: 0,
-        online: false,
-        annonceTitle,
-      }
-      return [convo, ...prev]
-    })
-    if (!newId) {
+  const createConversation = useCallback(
+    async (page: Page, initialMessage?: string): Promise<string> => {
       const existing = conversations.find((c) => c.page.id === page.id)
-      newId = existing?.id ?? `c-${page.id}-${Date.now()}`
-    }
-    return newId
-  }, [conversations])
+      if (existing) {
+        if (initialMessage) {
+          await sendMessage(existing.id, initialMessage)
+        }
+        return existing.id
+      }
 
-  const markAsRead = useCallback((conversationId: string) => {
+      const conversation = await messagesService.createConversation({
+        participantId: page.id,
+        initialMessage,
+      })
+
+      setConversations((prev) => [conversation, ...prev])
+      return conversation.id
+    },
+    [conversations, sendMessage],
+  )
+
+  const markAsRead = useCallback(async (conversationId: string) => {
+    await messagesService.markAsRead(conversationId)
     setConversations((prev) =>
       prev.map((c) => (c.id === conversationId ? { ...c, unread: 0 } : c)),
     )
   }, [])
 
+  useEffect(() => {
+    const subs: Array<{ unsubscribe: () => void }> = []
+
+    conversations.forEach((conversation) => {
+      const sub = messagesService.subscribeToMessages(conversation.id, (message) => {
+        setMessagesByConvo((prev) => {
+          const existing = prev[conversation.id]?.find((m) => m.id === message.id)
+          if (existing) return prev
+          return {
+            ...prev,
+            [conversation.id]: [...(prev[conversation.id] ?? []), message],
+          }
+        })
+
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === conversation.id
+              ? {
+                  ...c,
+                  lastPreview: message.content,
+                  lastKind: message.type,
+                  time: message.time,
+                  unread: message.fromMe ? c.unread : c.unread + 1,
+                }
+              : c,
+          ),
+        )
+      })
+      subs.push(sub)
+    })
+
+    return () => {
+      subs.forEach((sub) => sub.unsubscribe())
+    }
+  }, [conversations])
+
   const value = useMemo<MessageContextValue>(
     () => ({
       conversations,
+      isLoading,
       getConversation,
       getMessages,
       sendMessage,
-      deleteMessage,
       createConversation,
       markAsRead,
+      loadMessages,
     }),
-    [conversations, getConversation, getMessages, sendMessage, deleteMessage, createConversation, markAsRead],
+    [conversations, isLoading, getConversation, getMessages, sendMessage, createConversation, markAsRead, loadMessages],
   )
 
   return <MessageContext.Provider value={value}>{children}</MessageContext.Provider>

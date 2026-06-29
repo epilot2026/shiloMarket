@@ -1,76 +1,92 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { AccountType, User } from '../types'
-import { demoUser } from '../data/users'
+import {
+  signIn,
+  signUp,
+  signOut,
+  getCurrentUser,
+  updateCurrentUser,
+  onAuthStateChange,
+  type RegisterInput as AuthRegisterInput,
+} from '../services/auth.service'
 
-interface RegisterInput {
-  fullName: string
-  phone: string
-  accountType: AccountType
-}
+export interface RegisterInput extends AuthRegisterInput {}
 
 interface AuthContextValue {
   user: User | null
   isAuthenticated: boolean
-  login: (phone: string, _password: string) => Promise<void>
-  register: (input: RegisterInput) => Promise<void>
-  updateUser: (patch: Partial<User>) => void
-  logout: () => void
+  isAdmin: boolean
+  isLoading: boolean
+  login: (phone: string, password: string) => Promise<{ error?: string }>
+  register: (input: RegisterInput) => Promise<{ error?: string }>
+  updateUser: (patch: Partial<User>) => Promise<{ error?: string }>
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
-const STORAGE_KEY = 'shilomarket_demo_user'
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      try {
-        setUser(JSON.parse(raw))
-      } catch {
-        localStorage.removeItem(STORAGE_KEY)
+    let mounted = true
+
+    getCurrentUser().then((current) => {
+      if (mounted) {
+        setUser(current)
+        setIsLoading(false)
       }
+    })
+
+    const subscription = onAuthStateChange((next) => {
+      if (mounted) setUser(next)
+    })
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
     }
   }, [])
 
-  function persist(next: User | null) {
+  async function login(phone: string, password: string) {
+    const { user: next, error } = await signIn({ phone, password })
+    if (error) return { error: error.message }
     setUser(next)
-    if (next) localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-    else localStorage.removeItem(STORAGE_KEY)
-  }
-
-  async function login(phone: string, _password: string) {
-    // Démo : on connecte l'utilisateur fictif quelles que soient les valeurs valides.
-    persist({ ...demoUser, phone: phone || demoUser.phone })
+    return {}
   }
 
   async function register(input: RegisterInput) {
-    persist({
-      ...demoUser,
-      fullName: input.fullName || demoUser.fullName,
-      phone: input.phone || demoUser.phone,
-      accountType: input.accountType,
-    })
+    const { user: next, error } = await signUp(input)
+    if (error) return { error: error.message }
+    setUser(next)
+    return {}
   }
 
-  function updateUser(patch: Partial<User>) {
-    setUser((prev) => {
-      if (!prev) return prev
-      const next = { ...prev, ...patch }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-      return next
-    })
+  async function updateUser(patch: Partial<User>) {
+    const { user: next, error } = await updateCurrentUser(patch)
+    if (error) return { error: error.message }
+    if (next) setUser(next)
+    return {}
   }
 
-  function logout() {
-    persist(null)
+  async function logout() {
+    await signOut()
+    setUser(null)
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: Boolean(user), login, register, updateUser, logout }}
+      value={{
+        user,
+        isAuthenticated: Boolean(user),
+        isAdmin: user?.role === 'super_admin',
+        isLoading,
+        login,
+        register,
+        updateUser,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

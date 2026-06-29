@@ -1,12 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Heart, MessageCircle, Share2, Plus, MessageSquare, MapPin, ChevronUp, ChevronDown } from 'lucide-react'
-import { shorts } from '../data/shorts'
+import { shortsService } from '../services/shorts.service'
 import { formatCount } from '../lib/format'
 import { VerifiedBadge } from '../components/ui/Badges'
 import { useData } from '../context/DataContext'
 import { useMessages } from '../context/MessageContext'
 import { useToast } from '../context/ToastContext'
+import type { Short } from '../types'
 
 function ShortItem({
   short,
@@ -22,7 +23,7 @@ function ShortItem({
   onShow,
   onContact,
 }: {
-  short: (typeof shorts)[number]
+  short: Short
   index: number
   total: number
   isActive: boolean
@@ -142,8 +143,20 @@ export default function Shorts() {
   const [active, setActive] = useState(0)
   const [liked, setLiked] = useState<Set<string>>(new Set())
   const [isLiking, setIsLiking] = useState(false)
+  const [shorts, setShorts] = useState<Short[]>([])
+  const [loading, setLoading] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  useEffect(() => {
+    shortsService.list().then((data) => {
+      setShorts(data)
+      setLoading(false)
+    }).catch(() => {
+      setShorts([])
+      setLoading(false)
+    })
+  }, [])
 
   const short = shorts[active]
 
@@ -152,19 +165,19 @@ export default function Shorts() {
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
-  const next = useCallback(() => {
-    const i = Math.min(active + 1, shorts.length - 1)
-    scrollToIndex(i)
-  }, [active, scrollToIndex])
+  const next = useCallback((i: number) => {
+    const idx = Math.min(i, shorts.length - 1)
+    scrollToIndex(idx)
+  }, [shorts.length, scrollToIndex])
 
-  const prev = useCallback(() => {
-    const i = Math.max(active - 1, 0)
-    scrollToIndex(i)
-  }, [active, scrollToIndex])
+  const prev = useCallback((i: number) => {
+    const idx = Math.max(i, 0)
+    scrollToIndex(idx)
+  }, [scrollToIndex])
 
   function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); next() }
-    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); prev() }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); next(active + 1) }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); prev(active - 1) }
   }
 
   function toggleLike() {
@@ -196,6 +209,22 @@ export default function Shorts() {
     itemRefs.current.forEach((el) => el && observer.observe(el))
     return () => observer.disconnect()
   }, [])
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center bg-black text-white">
+        <p>Chargement…</p>
+      </div>
+    )
+  }
+
+  if (shorts.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center bg-black text-white">
+        <p>Aucun Short disponible.</p>
+      </div>
+    )
+  }
 
   const isLiked = liked.has(short.id)
   const following = isFollowing(short.page.id)
@@ -239,8 +268,9 @@ export default function Shorts() {
                 onContact={
                   i === active
                     ? () => {
-                        const convoId = createConversation(s.page)
-                        navigate(`/messages/${convoId}`)
+                        createConversation(s.page).then((convoId) => {
+                          navigate(`/messages/${convoId}`)
+                        })
                       }
                     : () => {}
                 }
@@ -250,7 +280,7 @@ export default function Shorts() {
         </div>
 
         <button
-          onClick={prev}
+          onClick={() => prev(active - 1)}
           aria-label="Short précédent"
           disabled={active === 0}
           className="absolute left-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/15 p-2 text-white transition hover:bg-white/25 disabled:opacity-30 xl:block"
@@ -258,7 +288,7 @@ export default function Shorts() {
           <ChevronUp size={22} />
         </button>
         <button
-          onClick={next}
+          onClick={() => next(active + 1)}
           aria-label="Short suivant"
           disabled={active === shorts.length - 1}
           className="absolute right-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/15 p-2 text-white transition hover:bg-white/25 disabled:opacity-30 xl:block"

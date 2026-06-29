@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import { useMessages } from '../context/MessageContext'
@@ -15,32 +15,47 @@ export default function Conversation() {
   const navigate = useNavigate()
   const { annonces } = useData()
   const { show } = useToast()
-  const { getConversation, getMessages, sendMessage, deleteMessage, createConversation, markAsRead } = useMessages()
+  const { getConversation, getMessages, sendMessage, createConversation, markAsRead, loadMessages } = useMessages()
 
-  const convo = useMemo<Conversation | undefined>(() => {
-    if (!id) return undefined
+  const [convo, setConvo] = useState<Conversation | undefined>(undefined)
+
+  useEffect(() => {
+    if (!id) {
+      setConvo(undefined)
+      return
+    }
     const existing = getConversation(id)
-    if (existing) return existing
+    if (existing) {
+      setConvo(existing)
+      return
+    }
     const annonce = annonces.find((a) => a.id === id)
     if (annonce) {
-      const newId = createConversation(annonce.page, annonce.title)
-      return getConversation(newId)
+      createConversation(annonce.page, annonce.title).then((newId) => {
+        setConvo(getConversation(newId))
+      })
+    } else {
+      setConvo(undefined)
     }
-    return undefined
   }, [id, annonces, getConversation, createConversation])
 
   const conversationId = convo?.id ?? id ?? ''
-  const [messages, setMessages] = useState<ChatMessage[]>(
-    getMessages(conversationId),
-  )
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [typing, setTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
+    if (!conversationId) return
+    loadMessages(conversationId).then(() => {
+      setMessages(getMessages(conversationId))
+    })
+    markAsRead(conversationId)
+  }, [conversationId, loadMessages, getMessages, markAsRead])
+
+  useEffect(() => {
     setMessages(getMessages(conversationId))
-    if (conversationId) markAsRead(conversationId)
-  }, [conversationId])
+  }, [conversationId, getMessages])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -57,89 +72,47 @@ export default function Conversation() {
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
   }
 
-  function simulateReply() {
+  const simulateReply = useCallback(() => {
     setTyping(true)
     replyTimer.current = setTimeout(() => {
       setTyping(false)
-      const replyMsg: ChatMessage = {
-        id: `m${Date.now()}-r`,
-        fromMe: false,
-        type: 'text',
-        content: 'Merci pour votre message, je reviens vers vous très vite !',
-        time: nowTime(),
-      }
-      setMessages((m) => [...m, replyMsg])
-      sendMessage(conversationId, replyMsg)
+      const text = 'Merci pour votre message, je reviens vers vous très vite !'
+      setMessages((m) => [...m, { id: `m${Date.now()}-r`, fromMe: false, type: 'text', content: text, time: nowTime() }])
+      if (conversationId) sendMessage(conversationId, text)
     }, 2000)
-  }
+  }, [conversationId, sendMessage])
 
-  function handleSendText(text: string) {
-    const msg: ChatMessage = {
-      id: `m${Date.now()}`,
-      fromMe: true,
-      type: 'text',
-      content: text,
-      time: nowTime(),
-      read: false,
-    }
-    setMessages((m) => [...m, msg])
-    sendMessage(conversationId, msg)
+  async function handleSendText(text: string) {
+    setMessages((m) => [...m, { id: `m${Date.now()}`, fromMe: true, type: 'text', content: text, time: nowTime(), read: false }])
+    await sendMessage(conversationId, text)
     simulateReply()
   }
 
-  function handleSendVoice(durationSec: number) {
-    const msg: ChatMessage = {
-      id: `m${Date.now()}`,
-      fromMe: true,
-      type: 'voice',
-      content: `0:${String(durationSec).padStart(2, '0')}`,
-      time: nowTime(),
-      read: false,
-    }
-    setMessages((m) => [...m, msg])
-    sendMessage(conversationId, msg)
+  async function handleSendVoice(durationSec: number) {
+    const content = `0:${String(durationSec).padStart(2, '0')}`
+    setMessages((m) => [...m, { id: `m${Date.now()}`, fromMe: true, type: 'voice', content, time: nowTime(), read: false }])
+    await sendMessage(conversationId, content, 'voice')
     simulateReply()
   }
 
-  function handleAttach(kind: string) {
+  async function handleAttach(kind: string) {
     if (kind === 'photo') {
       const seed = `chat${Date.now()}`
-      const msg: ChatMessage = {
-        id: `m${Date.now()}`,
-        fromMe: true,
-        type: 'image',
-        content: `https://picsum.photos/seed/${seed}/600/400`,
-        time: nowTime(),
-        read: false,
-      }
-      setMessages((m) => [...m, msg])
-      sendMessage(conversationId, msg)
+      const content = `https://picsum.photos/seed/${seed}/600/400`
+      setMessages((m) => [...m, { id: `m${Date.now()}`, fromMe: true, type: 'image', content, time: nowTime(), read: false }])
+      await sendMessage(conversationId, content, 'image')
       show('Photo envoyée')
       simulateReply()
     } else if (kind === 'location') {
-      const msg: ChatMessage = {
-        id: `m${Date.now()}`,
-        fromMe: true,
-        type: 'location',
-        content: 'Brazzaville, Congo',
-        time: nowTime(),
-        read: false,
-      }
-      setMessages((m) => [...m, msg])
-      sendMessage(conversationId, msg)
+      const content = 'Brazzaville, Congo'
+      setMessages((m) => [...m, { id: `m${Date.now()}`, fromMe: true, type: 'location', content, time: nowTime(), read: false }])
+      await sendMessage(conversationId, content, 'location')
       show('Localisation partagée')
       simulateReply()
     } else if (kind === 'document') {
-      const msg: ChatMessage = {
-        id: `m${Date.now()}`,
-        fromMe: true,
-        type: 'document',
-        content: 'Contrat_de_location.pdf',
-        time: nowTime(),
-        read: false,
-      }
-      setMessages((m) => [...m, msg])
-      sendMessage(conversationId, msg)
+      const content = 'Contrat_de_location.pdf'
+      setMessages((m) => [...m, { id: `m${Date.now()}`, fromMe: true, type: 'document', content, time: nowTime(), read: false }])
+      await sendMessage(conversationId, content, 'document')
       show('Document envoyé')
       simulateReply()
     }
@@ -147,8 +120,7 @@ export default function Conversation() {
 
   function handleDeleteMessage(msgId: string) {
     setMessages((m) => m.filter((msg) => msg.id !== msgId))
-    deleteMessage(conversationId, msgId)
-    show('Message supprimé')
+    show('Message supprimé (côté client uniquement)')
   }
 
   if (!convo) {

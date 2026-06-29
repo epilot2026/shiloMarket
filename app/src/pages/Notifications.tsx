@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { VerifiedBadge } from '../components/ui/Badges'
+import { notificationsService, type Notification as DbNotification } from '../services/notifications.service'
 
 type NotifType = 'like' | 'comment' | 'save' | 'follow' | 'certified' | 'trending'
 
@@ -34,77 +35,77 @@ const ICONS: Record<NotifType, { icon: typeof Heart; color: string }> = {
   trending: { icon: TrendingUp, color: 'text-primary' },
 }
 
-const MOCK_NOTIFS: Notif[] = [
-  {
-    id: 'n1',
-    type: 'like',
-    actor: { name: 'Shilo Immobilier', avatar: 'https://i.pravatar.cc/150?img=47', verified: true },
-    text: 'a aimé votre annonce « Maison meublée 4 pièces »',
-    time: '5 min',
-    link: '/annonce/a1',
-    read: false,
-    thumbnail: 'https://picsum.photos/seed/maison1a/120/120',
-  },
-  {
-    id: 'n2',
-    type: 'comment',
-    actor: { name: 'Congo Auto Location', avatar: 'https://i.pravatar.cc/150?img=12', verified: true },
-    text: 'a commenté : « Disponible ce weekend ? »',
-    time: '20 min',
-    link: '/annonce/a2',
-    read: false,
-    thumbnail: 'https://picsum.photos/seed/toyota1/120/120',
-  },
-  {
-    id: 'n3',
-    type: 'follow',
-    actor: { name: 'Agence Plateau', avatar: 'https://i.pravatar.cc/150?img=32', verified: true },
-    text: 'a commencé à suivre votre page',
-    time: '1 h',
-    link: '/profil',
-    read: false,
-  },
-  {
-    id: 'n4',
-    type: 'certified',
-    actor: { name: 'ShiloMarket', avatar: 'https://i.pravatar.cc/150?img=60' },
-    text: '🎉 Votre annonce a été certifiée !',
-    time: '3 h',
-    link: '/annonce/a5',
-    read: true,
-    thumbnail: 'https://picsum.photos/seed/villa5a/120/120',
-  },
-  {
-    id: 'n5',
-    type: 'save',
-    actor: { name: 'ShiloTech Solutions', avatar: 'https://i.pravatar.cc/150?img=60', verified: true },
-    text: 'a enregistré votre annonce « Terrain 500m² »',
-    time: '5 h',
-    link: '/annonce/a4',
-    read: true,
-    thumbnail: 'https://picsum.photos/seed/terrain1/120/120',
-  },
-  {
-    id: 'n6',
-    type: 'trending',
-    actor: { name: 'ShiloMarket', avatar: 'https://i.pravatar.cc/150?img=5' },
-    text: '🔥 Votre annonce est populaire cette semaine !',
-    time: '1 j',
-    link: '/annonce/a5',
-    read: true,
-    thumbnail: 'https://picsum.photos/seed/villa5a/120/120',
-  },
-  {
-    id: 'n7',
-    type: 'like',
-    actor: { name: 'Moungali Services', avatar: 'https://i.pravatar.cc/150?img=22' },
-    text: 'et 12 autres ont aimé votre annonce',
-    time: '2 j',
-    link: '/annonce/a3',
-    read: true,
-    thumbnail: 'https://picsum.photos/seed/clim1/120/120',
-  },
-]
+function mapType(type: DbNotification['type']): NotifType {
+  switch (type) {
+    case 'reaction':
+      return 'like'
+    case 'comment':
+      return 'comment'
+    case 'message':
+      return 'comment'
+    case 'follow':
+      return 'follow'
+    case 'certification':
+      return 'certified'
+    case 'new_annonce':
+    case 'system':
+    default:
+      return 'trending'
+  }
+}
+
+function mapNotification(n: DbNotification): Notif {
+  const payload = n.payload || {}
+  const actorName = (payload.actor_name as string) || 'ShiloMarket'
+  const actorAvatar = (payload.actor_avatar as string) || 'https://i.pravatar.cc/150?img=1'
+  const actorVerified = (payload.actor_verified as boolean) || false
+  const targetId = (payload.target_id as string) || ''
+  const targetTitle = (payload.target_title as string) || ''
+  const type = mapType(n.type)
+
+  let text = ''
+  let link = '/'
+  let thumbnail = payload.target_thumbnail as string | undefined
+
+  switch (type) {
+    case 'like':
+      text = `a aimé votre annonce ${targetTitle ? `« ${targetTitle} »` : ''}`
+      link = targetId ? `/annonce/${targetId}` : '/'
+      break
+    case 'comment':
+      text = `a commenté : « ${payload.comment_text || targetTitle} »`
+      link = targetId ? `/annonce/${targetId}` : '/'
+      break
+    case 'save':
+      text = `a enregistré votre annonce ${targetTitle ? `« ${targetTitle} »` : ''}`
+      link = targetId ? `/annonce/${targetId}` : '/'
+      break
+    case 'follow':
+      text = 'a commencé à suivre votre page'
+      link = '/profil'
+      thumbnail = undefined
+      break
+    case 'certified':
+      text = '🎉 Votre annonce a été certifiée !'
+      link = targetId ? `/annonce/${targetId}` : '/'
+      break
+    case 'trending':
+    default:
+      text = '🔥 Nouvelle activité sur votre annonce'
+      link = targetId ? `/annonce/${targetId}` : '/'
+  }
+
+  return {
+    id: n.id,
+    type,
+    actor: { name: actorName, avatar: actorAvatar, verified: actorVerified },
+    text,
+    time: n.createdAt,
+    link,
+    read: n.read,
+    thumbnail,
+  }
+}
 
 const TABS = [
   { key: 'all', label: 'Toutes' },
@@ -115,7 +116,29 @@ const TABS = [
 export default function Notifications() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<(typeof TABS)[number]['key']>('all')
-  const [notifs, setNotifs] = useState(MOCK_NOTIFS)
+  const [notifs, setNotifs] = useState<Notif[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const load = async () => {
+    try {
+      const list = await notificationsService.list()
+      setNotifs(list.map(mapNotification))
+    } catch (err) {
+      console.error('Erreur chargement notifications', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    load()
+    const sub = notificationsService.subscribe((n) => {
+      setNotifs((prev) => [mapNotification(n), ...prev])
+    })
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [])
 
   const filtered = notifs.filter((n) => {
     if (tab === 'unread') return !n.read
@@ -125,11 +148,13 @@ export default function Notifications() {
 
   const unreadCount = notifs.filter((n) => !n.read).length
 
-  function markAllRead() {
+  async function markAllRead() {
+    await notificationsService.markAllAsRead()
     setNotifs((prev) => prev.map((n) => ({ ...n, read: true })))
   }
 
-  function handleClick(n: Notif) {
+  async function handleClick(n: Notif) {
+    await notificationsService.markAsRead(n.id)
     setNotifs((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)))
     navigate(n.link)
   }
@@ -188,7 +213,7 @@ export default function Notifications() {
                   }`}
                 >
                   <div className="relative shrink-0">
-                    <img src={n.actor.avatar} alt="" className="h-12 w-12 rounded-full object-cover" />
+                    <img src={n.actor.avatar} alt="" loading="lazy" className="h-12 w-12 rounded-full object-cover" />
                     <span className={`absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full bg-white shadow-sm ${color}`}>
                       <Icon size={14} className={color} />
                     </span>
@@ -204,7 +229,7 @@ export default function Notifications() {
                     <span className="mt-0.5 block text-xs text-muted">{n.time}</span>
                   </div>
                   {n.thumbnail ? (
-                    <img src={n.thumbnail} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
+                    <img src={n.thumbnail} alt="" loading="lazy" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
                   ) : (
                     !n.read && <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
                   )}

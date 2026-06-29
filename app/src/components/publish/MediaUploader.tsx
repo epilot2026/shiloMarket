@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { ImagePlus, Video as VideoIcon, Link2, X, Plus } from 'lucide-react'
+import { ImagePlus, Video as VideoIcon, Link2, X, Plus, Loader2 } from 'lucide-react'
+import { storageService } from '../../services/storage.service'
 
 interface MediaUploaderProps {
   images: string[]
@@ -22,13 +23,24 @@ export function MediaUploader({
   const videoInput = useRef<HTMLInputElement>(null)
   const [imageUrl, setImageUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
+  const [uploading, setUploading] = useState(false)
 
-  function addImageFiles(files: FileList | null) {
+  async function addImageFiles(files: FileList | null) {
     if (!files) return
-    const urls = Array.from(files)
-      .filter((f) => f.type.startsWith('image/'))
-      .map((f) => URL.createObjectURL(f))
-    if (urls.length) onImagesChange([...images, ...urls])
+    const imageFiles = Array.from(files).filter((f) => f.type.startsWith('image/'))
+    if (!imageFiles.length) return
+
+    setUploading(true)
+    try {
+      const urls = await storageService.uploadMultiple('annonces', imageFiles)
+      onImagesChange([...images, ...urls])
+    } catch (err) {
+      console.error('Upload error:', err)
+      const blobUrls = imageFiles.map((f) => URL.createObjectURL(f))
+      onImagesChange([...images, ...blobUrls])
+    } finally {
+      setUploading(false)
+    }
   }
 
   function addImageUrl() {
@@ -44,12 +56,22 @@ export function MediaUploader({
     onImagesChange(images.filter((_, i) => i !== index))
   }
 
-  function addVideoFiles(files: FileList | null) {
+  async function addVideoFiles(files: FileList | null) {
     if (!files) return
-    const urls = Array.from(files)
-      .filter((f) => f.type.startsWith('video/'))
-      .map((f) => URL.createObjectURL(f))
-    if (urls.length) onVideosChange([...videos, ...urls])
+    const videoFiles = Array.from(files).filter((f) => f.type.startsWith('video/'))
+    if (!videoFiles.length) return
+
+    setUploading(true)
+    try {
+      const urls = await storageService.uploadMultiple('annonces', videoFiles)
+      onVideosChange([...videos, ...urls])
+    } catch (err) {
+      console.error('Upload error:', err)
+      const blobUrls = videoFiles.map((f) => URL.createObjectURL(f))
+      onVideosChange([...videos, ...blobUrls])
+    } finally {
+      setUploading(false)
+    }
   }
 
   function addVideoUrl() {
@@ -73,7 +95,7 @@ export function MediaUploader({
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {images.map((src, i) => (
             <div key={`${src}-${i}`} className="relative aspect-square overflow-hidden rounded-xl bg-soft">
-              <img src={src} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+              <img src={src} alt={`Photo ${i + 1}`} loading="lazy" className="h-full w-full object-cover" />
               <button
                 type="button"
                 onClick={() => removeImage(i)}
@@ -92,10 +114,11 @@ export function MediaUploader({
           <button
             type="button"
             onClick={() => imageInput.current?.click()}
-            className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line text-muted hover:border-primary hover:text-primary"
+            disabled={uploading}
+            className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line text-muted hover:border-primary hover:text-primary disabled:opacity-50"
           >
-            <ImagePlus size={22} />
-            <span className="text-xs font-medium">Ajouter</span>
+            {uploading ? <Loader2 size={22} className="animate-spin" /> : <ImagePlus size={22} />}
+            <span className="text-xs font-medium">{uploading ? 'Upload…' : 'Ajouter'}</span>
           </button>
         </div>
         <input

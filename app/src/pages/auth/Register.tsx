@@ -36,9 +36,12 @@ export default function Register() {
       return
     }
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 600))
-    await register({ fullName, phone, accountType })
+    const { error: authError } = await register({ fullName, phone, password, accountType })
     setLoading(false)
+    if (authError) {
+      setError(authError)
+      return
+    }
     navigate('/')
   }
 

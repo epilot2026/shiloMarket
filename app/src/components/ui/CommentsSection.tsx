@@ -3,7 +3,6 @@ import { MessageSquare, MoreHorizontal, Heart, Reply } from 'lucide-react'
 import { CommentInput } from './CommentInput'
 import { formatCount } from '../../lib/format'
 import { useAuth } from '../../context/AuthContext'
-import { demoUser } from '../../data/users'
 
 export interface Comment {
   id: string

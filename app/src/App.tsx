@@ -25,6 +25,7 @@ const MyAnnonces = lazy(() => import('./pages/MyAnnonces'))
 const SavedItems = lazy(() => import('./pages/SavedItems'))
 const HelpPage = lazy(() => import('./pages/HelpPage'))
 const PaymentsPage = lazy(() => import('./pages/PaymentsPage'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function PageLoader() {
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/aide" element={<Suspense fallback={<PageLoader />}><HelpPage /></Suspense>} />
               <Route path="/paiements" element={<Suspense fallback={<PageLoader />}><PaymentsPage /></Suspense>} />
               <Route path="/shorts" element={<Suspense fallback={<PageLoader />}><Shorts /></Suspense>} />
+              <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
               <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
             </Route>
           </Routes>
