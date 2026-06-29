@@ -84,7 +84,7 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-2 border-t border-line bg-white p-2 safe-bottom pb-6">
+    <div className="flex items-center gap-2 border-t border-line bg-white px-2 py-2 safe-bottom pb-8">
       <AttachmentMenu onAttach={onAttach} />
       <EmojiPicker onPick={addEmoji} />
       <input
@@ -93,7 +93,7 @@ export function ChatInput({ onSendText, onSendVoice, onAttach }: Props) {
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && send()}
         placeholder="Écrire un message…"
-        className="flex-1 rounded-lg bg-soft px-4 py-2.5 outline-none"
+        className="min-w-0 flex-1 rounded-lg bg-soft px-3 py-2.5 outline-none"
       />
       {draft.trim() ? (
         <button
