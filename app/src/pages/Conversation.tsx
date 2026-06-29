@@ -170,7 +170,6 @@ export default function Conversation() {
         <ChatHeader
           convo={convo}
           onCallAudio={() => show('Appel audio en cours… (démo)')}
-          onCallVideo={() => show('Appel vidéo en cours… (démo)')}
         />
 
         {convo.annonceTitle && (

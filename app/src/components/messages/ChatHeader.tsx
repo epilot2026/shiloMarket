@@ -1,15 +1,14 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Phone, Video } from 'lucide-react'
+import { ArrowLeft, Phone } from 'lucide-react'
 import { VerifiedBadge } from '../ui/Badges'
 import type { Conversation } from '../../types'
 
 interface Props {
   convo: Conversation
   onCallAudio: () => void
-  onCallVideo: () => void
 }
 
-export function ChatHeader({ convo, onCallAudio, onCallVideo }: Props) {
+export function ChatHeader({ convo, onCallAudio }: Props) {
   const navigate = useNavigate()
 
   return (
@@ -29,9 +28,6 @@ export function ChatHeader({ convo, onCallAudio, onCallVideo }: Props) {
       </div>
       <button onClick={onCallAudio} className="grid h-10 w-10 place-items-center rounded-full bg-soft" aria-label="Appel audio">
         <Phone size={18} />
-      </button>
-      <button onClick={onCallVideo} className="grid h-10 w-10 place-items-center rounded-full bg-soft" aria-label="Appel vidéo">
-        <Video size={18} />
       </button>
     </header>
   )

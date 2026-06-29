@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Bookmark, Share2, MapPin, MessageCircle, Phone, Video, ThumbsUp, MessageSquare, FileText, Download } from 'lucide-react'
+import { ArrowLeft, Bookmark, Share2, MapPin, MessageCircle, Phone, ThumbsUp, MessageSquare, FileText, Download } from 'lucide-react'
 import { formatPrice, formatCount } from '../lib/format'
 import { ImageCarousel } from '../components/ui/ImageCarousel'
 import { VerifiedBadge, CertifiedTag, AvailableTag } from '../components/ui/Badges'
@@ -139,7 +139,6 @@ export default function AnnonceDetail() {
               <MessageCircle size={18} /> Discuter
             </button>
             <button onClick={() => show('Appel audio en cours… (démo)')} className="btn-outline w-full"><Phone size={18} /> Appeler</button>
-            <button onClick={() => show('Appel vidéo en cours… (démo)')} className="btn-outline w-full"><Video size={18} /> Appel vidéo</button>
           </div>
         </aside>
       </div>
@@ -150,7 +149,6 @@ export default function AnnonceDetail() {
           <MessageCircle size={18} /> Discuter
         </button>
         <button onClick={() => show('Appel audio en cours… (démo)')} aria-label="Appel audio" className="grid h-12 w-14 place-items-center rounded-xl bg-primary-light text-primary"><Phone size={20} /></button>
-        <button onClick={() => show('Appel vidéo en cours… (démo)')} aria-label="Appel vidéo" className="grid h-12 w-14 place-items-center rounded-xl bg-primary-light text-primary"><Video size={20} /></button>
       </div>
     </div>
   )
